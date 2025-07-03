@@ -1,9 +1,6 @@
 // main library
 import { useNavigate } from "react-router-dom";
 
-// components
-import StarfieldBackground from "@components/StarfieldBackground";
-
 // styles
 import classes from "./HomePage.module.scss";
 
@@ -15,15 +12,12 @@ const HomePage = () => {
   };
 
   return (
-    <div className="page">
-      <StarfieldBackground />
-      <div className={classes.layout}>
-        <div className={classes.gameButtons}>
-          <button className={classes.button} onClick={handleNewGameClick}>
-            New Game
-          </button>
-          <button className={classes.button}>Resume Game</button>
-        </div>
+    <div className={classes.layout}>
+      <div className={classes.gameButtons}>
+        <button className={classes.button} onClick={handleNewGameClick}>
+          New Game
+        </button>
+        <button className={classes.button}>Resume Game</button>
       </div>
     </div>
   );
