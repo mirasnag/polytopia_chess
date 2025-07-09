@@ -1,6 +1,6 @@
 // types
 import type { GameState, Units } from "@/types/game";
-import type { PlayerId } from "@/types/id";
+import type { PlayerId, UnitId } from "@/types/id";
 import type { MapGrid, Tile } from "@/types/tile";
 import type { UnitType } from "@/types/unit";
 
@@ -106,5 +106,55 @@ export function createInitialGameState(): GameState {
     units: units,
     map: map,
     isFinished: false,
+  };
+}
+
+function updateTileOccupants(
+  tiles: Tile[][],
+  unitId: UnitId,
+  from: { x: number; y: number },
+  to: { x: number; y: number }
+): Tile[][] {
+  return tiles.map((row, y) =>
+    row.map((tile, x) => {
+      if (x === from.x && y === from.y)
+        return { ...tile, occupantId: undefined };
+      if (x === to.x && y === to.y) return { ...tile, occupantId: unitId };
+      return tile;
+    })
+  );
+}
+
+export function moveUnit(
+  state: GameState,
+  unitId: UnitId,
+  x: number,
+  y: number
+): GameState {
+  const unit = state.units[unitId];
+  const { x: oldX, y: oldY } = unit.position;
+
+  const updatedUnits = {
+    ...state.units,
+    [unitId]: {
+      ...unit,
+      position: { x, y },
+    },
+  };
+
+  const updatedTiles = updateTileOccupants(
+    state.map.tiles,
+    unitId,
+    { x: oldX, y: oldY },
+    { x, y }
+  );
+
+  return {
+    ...state,
+    units: updatedUnits,
+    map: {
+      ...state.map,
+      tiles: updatedTiles,
+    },
   };
 }
