@@ -26,11 +26,5 @@ export interface GameState {
   };
   units: Record<UnitId, Unit>;
   map: MapGrid;
-}
-
-export interface Game {
-  id: GameId;
-  state: GameState;
-  players: Record<PlayerId, Player>;
   isFinished: boolean;
 }
