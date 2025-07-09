@@ -13,6 +13,10 @@ const UNIT_STATS: Record<UnitType, UnitStats> = {
 
 export const getUnitStats = () => UNIT_STATS;
 
-export const getUnitHP = (unitType: UnitType) => {
-  return UNIT_STATS[unitType].hp;
-};
+export const getUnitHP = (unitType: UnitType) => UNIT_STATS[unitType].hp;
+
+export const getUnitAttack = (unitType: UnitType) =>
+  UNIT_STATS[unitType].attack;
+
+export const getUnitDefense = (unitType: UnitType) =>
+  UNIT_STATS[unitType].defense;
