@@ -7,6 +7,7 @@ import {
 } from "./map";
 import { createUnits } from "./units";
 import { calculateDamage, schemaVersion } from "./common";
+import { advanceTurn, getInitialTurn } from "./turn";
 
 // utils
 import { createBrandedId } from "@/common/utils";
@@ -21,14 +22,16 @@ export function createInitialGameState(): GameState {
 
   const units = createUnits(playerA, playerB);
   const map = applyUnitsToMap(createMap(), units);
+  const players = {
+    playerA: { id: playerA },
+    playerB: { id: playerB },
+  };
+  const turns = getInitialTurn(players);
 
   return {
     schemaVersion: schemaVersion,
-    turn: {
-      moveNumber: 0,
-      currentPlayer: playerA,
-      actionUsed: false,
-    },
+    players: players,
+    turn: turns,
     units: units,
     map: map,
     isFinished: false,
@@ -59,6 +62,8 @@ export function moveUnit(
     { x, y }
   );
 
+  const updatedTurn = advanceTurn(state.turn);
+
   return {
     ...state,
     units: updatedUnits,
@@ -66,6 +71,7 @@ export function moveUnit(
       ...state.map,
       tiles: updatedTiles,
     },
+    turn: updatedTurn,
   };
 }
 
@@ -77,6 +83,8 @@ export function attackUnit(
   const attackingUnit = state.units[attackingUnitId];
   const defendingUnit = state.units[defendingUnitId];
   const damage = calculateDamage(attackingUnit, defendingUnit);
+
+  const updatedTurn = advanceTurn(state.turn);
 
   if (damage >= defendingUnit.hp) {
     const { [defendingUnitId]: _, ...remainingUnits } = state.units;
@@ -92,6 +100,7 @@ export function attackUnit(
         ...state.map,
         tiles: updatedTiles,
       },
+      turn: updatedTurn,
     };
   }
 
@@ -104,5 +113,6 @@ export function attackUnit(
         hp: defendingUnit.hp - damage,
       },
     },
+    turn: updatedTurn,
   };
 }
