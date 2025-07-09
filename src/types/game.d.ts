@@ -1,6 +1,7 @@
-import type { GameId, PlayerId, UnitId } from "./id";
-import type { MapGrid } from "./tile";
-import { UnitType } from "./unit";
+// types
+import type { GameId, PlayerId, UnitId } from "@/types/id";
+import type { MapGrid } from "@/types/tile";
+import { UnitType } from "@/types/unit";
 
 export interface Player {
   id: PlayerId;
@@ -14,6 +15,8 @@ export interface Unit {
   hp: number;
 }
 
+export type Units = Record<UnitId, Unit>;
+
 export interface GameState {
   schemaVersion: {
     major: number;
@@ -24,7 +27,7 @@ export interface GameState {
     currentPlayer: PlayerId;
     actionUsed: boolean;
   };
-  units: Record<UnitId, Unit>;
+  units: Units;
   map: MapGrid;
   isFinished: boolean;
 }
