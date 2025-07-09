@@ -1,5 +1,12 @@
+import { GameProvider } from "@/context/game/GameContext";
+import GameView from "@/views/game/GameView";
+
 const GamePage = () => {
-  return <div>Game</div>;
+  return (
+    <GameProvider>
+      <GameView />
+    </GameProvider>
+  );
 };
 
 export default GamePage;
