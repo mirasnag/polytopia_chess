@@ -6,6 +6,7 @@ import catapultFullbodyModel from "@/assets/unit_models/fullbody/catapult.webp";
 import knightFullbodyModel from "@/assets/unit_models/fullbody/knight.webp";
 import swordsmanFullbodyModel from "@/assets/unit_models/fullbody/swordsman.webp";
 import mindBenderFullbodyModel from "@/assets/unit_models/fullbody/mindBender.webp";
+import defenderFullbodyModel from "@/assets/unit_models/fullbody/defender.webp";
 
 interface UnitModels {
   fullbody: string;
@@ -19,6 +20,7 @@ const UNIT_MODELS: Record<UnitType, UnitModels> = {
   knight: { fullbody: knightFullbodyModel },
   swordsman: { fullbody: swordsmanFullbodyModel },
   mindBender: { fullbody: mindBenderFullbodyModel },
+  defender: { fullbody: defenderFullbodyModel },
 };
 
 export const getUnitModels = () => UNIT_MODELS;

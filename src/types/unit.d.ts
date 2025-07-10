@@ -1,10 +1,12 @@
 export type UnitType =
-  | "warrior" // pawn
-  | "archer" // bishop
-  | "rider" // knight
-  | "catapult" // rook
-  | "knight" // queen
-  | "swordsman"; // king
+  | "warrior"
+  | "archer"
+  | "rider"
+  | "catapult"
+  | "knight"
+  | "swordsman"
+  | "defender"
+  | "mindBender";
 
 export interface UnitStats {
   hp: number;
