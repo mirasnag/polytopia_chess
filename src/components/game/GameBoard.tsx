@@ -1,5 +1,5 @@
 // hooks
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useGame } from "@/context/game/GameContext";
 
 // components
@@ -16,25 +16,26 @@ import type { Tile } from "@/types/tile";
 import classes from "./GameBoard.module.scss";
 
 const GameBoard = () => {
-  const { state, dispatch } = useGame();
-  const { tiles } = state.map;
-  const units = state.units;
-  const currentPlayerId = state.turn.playerOrder[state.turn.orderIndex];
+  const { state, currentPlayer, tiles, units, dispatch } = useGame();
 
   const [activeTile, setActiveTile] = useState<Tile | null>(null);
   const activeUnitId = activeTile?.occupantId;
-  const activeUnit =
-    activeUnitId && units[activeUnitId].ownerId === currentPlayerId
-      ? units[activeUnitId]
-      : null;
 
-  let validMoves = new Set<Tile>();
-  let validAttacks = new Set<Tile>();
+  const activeUnit = useMemo(() => {
+    if (!activeUnitId) return null;
+    const unit = units[activeUnitId];
+    return unit?.ownerId === currentPlayer.id ? unit : null;
+  }, [activeTile, units, currentPlayer.id]);
 
-  if (activeUnit) {
-    validMoves = getValidMoves(state, activeUnit);
-    validAttacks = getValidAttacks(state, activeUnit);
-  }
+  const validMoves = useMemo(
+    () => (activeUnit ? getValidMoves(state, activeUnit) : new Set<Tile>()),
+    [activeUnit, state]
+  );
+
+  const validAttacks = useMemo(
+    () => (activeUnit ? getValidAttacks(state, activeUnit) : new Set<Tile>()),
+    [activeUnit, state]
+  );
 
   const handleTileClick = (tile: Tile) => {
     if (!activeUnit) {
@@ -85,11 +86,12 @@ const GameBoard = () => {
             <BoardTile
               key={colIndex}
               tile={tile}
-              isActive={activeTile === tile}
-              isValidAttack={validAttacks.has(tile)}
-              isValidMove={validMoves.has(tile)}
+              tileState={{
+                isActive: activeTile === tile,
+                isValidAttack: validAttacks.has(tile),
+                isValidMove: validMoves.has(tile),
+              }}
               handleTileClick={handleTileClick}
-              occupant={tile.occupantId && units[tile.occupantId]}
             />
           ))}
         </div>

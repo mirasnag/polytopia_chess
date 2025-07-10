@@ -1,37 +1,41 @@
+// hooks
+import { useGame } from "@/context/game/GameContext";
+
 // components
 import UnitView from "@/components/unit/UnitView";
 
 // types
 import type { Tile } from "@/types/tile";
-import type { Unit } from "@/types/game";
 
 // styles
 import classes from "./GameBoard.module.scss";
 
-interface Props {
-  tile: Tile;
-  handleTileClick: (tile: Tile) => void;
+interface TileState {
   isActive: boolean;
   isValidMove: boolean;
   isValidAttack: boolean;
-  occupant?: Unit;
 }
 
-const BoardTile: React.FC<Props> = ({
-  tile,
-  handleTileClick,
-  isActive,
-  isValidAttack,
-  isValidMove,
-  occupant,
-}) => {
+interface Props {
+  tile: Tile;
+  handleTileClick: (tile: Tile) => void;
+  tileState: TileState;
+}
+
+const BoardTile: React.FC<Props> = ({ tile, handleTileClick, tileState }) => {
+  const { isActive, isValidAttack, isValidMove } = tileState;
+  const { currentPlayer, units } = useGame();
+  const tileUnit = tile.occupantId ? units[tile.occupantId] : null;
+
   const tileClassName = `${classes.tile} ${isActive ? classes.active : ""} ${
     isValidAttack ? classes.validAttack : ""
-  } ${isValidMove ? classes.validMove : ""}`;
+  } ${isValidMove ? classes.validMove : ""} ${
+    currentPlayer.id === tileUnit?.ownerId ? classes.hasReadyUnit : ""
+  }`;
 
   return (
     <div className={tileClassName} onClick={() => handleTileClick(tile)}>
-      {occupant && <UnitView unit={occupant} />}
+      {tileUnit && <UnitView unit={tileUnit} />}
     </div>
   );
 };

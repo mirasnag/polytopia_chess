@@ -8,7 +8,7 @@ import {
 } from "react";
 
 // types
-import type { GameState } from "@/types/game";
+import type { GameState, PlayerInGame } from "@/types/game";
 
 // helpers
 import { gameReducer, type GameAction } from "./gameReducer";
@@ -16,6 +16,11 @@ import { createInitialGameState } from "./helpers";
 
 export const GameContext = createContext<{
   state: GameState;
+  units: GameState["units"];
+  tiles: GameState["map"]["tiles"];
+  turn: GameState["turn"];
+  players: GameState["players"];
+  currentPlayer: PlayerInGame;
   dispatch: Dispatch<GameAction>;
 } | null>(null);
 
@@ -30,11 +35,17 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     createInitialGameState
   );
 
-  return (
-    <GameContext.Provider value={{ state, dispatch }}>
-      {children}
-    </GameContext.Provider>
-  );
+  const value = {
+    state: state,
+    dispatch: dispatch,
+    units: state.units,
+    tiles: state.map.tiles,
+    turn: state.turn,
+    players: state.players,
+    currentPlayer: state.players[state.turn.playerOrder[state.turn.orderIndex]],
+  };
+
+  return <GameContext.Provider value={value}>{children}</GameContext.Provider>;
 };
 
 export function useGame() {
