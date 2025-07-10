@@ -24,8 +24,8 @@ export function createInitialGameState(): GameState {
   const units = createUnits(playerA, playerB);
   const map = applyUnitsToMap(createMap(), units);
   const players = {
-    [playerA]: { id: playerA },
-    [playerB]: { id: playerB },
+    [playerA]: { id: playerA, name: "A" },
+    [playerB]: { id: playerB, name: "B" },
   };
   const turns = getInitialTurn(players);
 

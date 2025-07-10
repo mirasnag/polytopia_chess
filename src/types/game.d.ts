@@ -5,6 +5,7 @@ import { UnitType } from "@/types/unit";
 
 export interface PlayerInGame {
   id: PlayerId;
+  name: string;
 }
 
 export type Players = Record<PlayerId, PlayerInGame>;
