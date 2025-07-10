@@ -6,15 +6,16 @@ import {
   removeTileOccupant,
 } from "./map";
 import { createUnits } from "./units";
-import { calculateDamage, schemaVersion } from "./common";
 import { advanceTurn, getInitialTurn } from "./turn";
 
 // utils
+import { calculateDamage } from "@/utils/combat";
 import { createBrandedId } from "@/utils/common";
 
 // types
 import type { GameState } from "@/types/game";
 import type { UnitId } from "@/types/id";
+import { schemaVersion } from "./common";
 
 export function createInitialGameState(): GameState {
   const playerA = createBrandedId("player");

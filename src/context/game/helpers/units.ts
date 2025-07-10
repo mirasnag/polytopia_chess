@@ -1,6 +1,6 @@
 // utils
 import { createBrandedId } from "@/utils/common";
-import { getUnitHP } from "@/data/unitStats";
+import { getUnitBaseStats } from "@/data/unitBaseStats";
 
 // types
 import type { Units } from "@/types/game";
@@ -44,7 +44,7 @@ function placeRowUnits(
       type: unitType,
       ownerId: owner,
       position: { x: col, y: row },
-      hp: getUnitHP(unitType),
+      hp: getUnitBaseStats(unitType).hp,
     };
   }
 }

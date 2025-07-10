@@ -1,0 +1,29 @@
+// data
+import { getUnitBaseStats } from "@/data/unitBaseStats";
+
+// types
+import type { GameState, Unit } from "@/types/game";
+import type { Tile } from "@/types/tile";
+
+export function getValidMoves(state: GameState, unit: Unit): Tile[] {
+  const validMoves = [] as Tile[];
+
+  const { movement } = getUnitBaseStats(unit.type);
+  const { x, y } = unit.position;
+  const { width, height, tiles } = state.map;
+
+  const minX = Math.max(0, x - movement);
+  const maxX = Math.min(width - 1, x + movement);
+  const minY = Math.max(0, y - movement);
+  const maxY = Math.min(height - 1, y + movement);
+
+  for (let nx = minX; nx <= maxX; nx++) {
+    for (let ny = minY; ny <= maxY; ny++) {
+      if (!tiles[nx][ny].occupantId) {
+        validMoves.push(tiles[nx][ny]);
+      }
+    }
+  }
+
+  return validMoves;
+}
