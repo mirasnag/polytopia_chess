@@ -1,5 +1,5 @@
 // data
-import { getUnitBaseStats } from "@/data/unitStats";
+import { getUnitBaseStats } from "@/data/unitBaseStats";
 
 // types
 import type { GameState, Unit } from "@/types/game";
