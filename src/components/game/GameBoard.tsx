@@ -25,7 +25,7 @@ const GameBoard = () => {
     if (!activeUnitId) return null;
     const unit = units[activeUnitId];
     return unit?.ownerId === currentPlayer.id ? unit : null;
-  }, [activeTile, units, currentPlayer.id]);
+  }, [activeTile, units, currentPlayer]);
 
   const validMoves = useMemo(
     () => (activeUnit ? getValidMoves(state, activeUnit) : new Set<Tile>()),
