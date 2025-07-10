@@ -10,7 +10,7 @@ import { calculateDamage, schemaVersion } from "./common";
 import { advanceTurn, getInitialTurn } from "./turn";
 
 // utils
-import { createBrandedId } from "@/utils/utils";
+import { createBrandedId } from "@/utils/common";
 
 // types
 import type { GameState } from "@/types/game";
