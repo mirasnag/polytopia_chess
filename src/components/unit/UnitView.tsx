@@ -4,14 +4,13 @@ import { getUnitFullbodyModel } from "@/data/unitModels";
 
 interface Props {
   unit: Unit;
-  handleUnitClick: (unit: Unit) => void;
 }
 
-const UnitView: React.FC<Props> = ({ unit, handleUnitClick }) => {
+const UnitView: React.FC<Props> = ({ unit }) => {
   const unitModel = getUnitFullbodyModel(unit.type);
 
   return (
-    <div className={classes.container} onClick={() => handleUnitClick(unit)}>
+    <div className={classes.container}>
       <img src={unitModel} className={classes.unitModel} />
     </div>
   );

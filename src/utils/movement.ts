@@ -5,8 +5,8 @@ import { getUnitBaseStats } from "@/data/unitBaseStats";
 import type { GameState, Unit } from "@/types/game";
 import type { Tile } from "@/types/tile";
 
-export function getValidMoves(state: GameState, unit: Unit): Tile[] {
-  const validMoves = [] as Tile[];
+export function getValidMoves(state: GameState, unit: Unit): Set<Tile> {
+  const validMoves = new Set<Tile>();
 
   const { movement } = getUnitBaseStats(unit.type);
   const { x, y } = unit.position;
@@ -19,8 +19,8 @@ export function getValidMoves(state: GameState, unit: Unit): Tile[] {
 
   for (let nx = minX; nx <= maxX; nx++) {
     for (let ny = minY; ny <= maxY; ny++) {
-      if (!tiles[nx][ny].occupantId) {
-        validMoves.push(tiles[nx][ny]);
+      if (!tiles[ny][nx].occupantId) {
+        validMoves.add(tiles[ny][nx]);
       }
     }
   }

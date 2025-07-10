@@ -25,6 +25,14 @@
         border: 3px solid lightblue;
       }
 
+      &.validAttack {
+        border: 3px solid red;
+      }
+
+      &.validMove {
+        border: 3px solid greenyellow;
+      }
+
       &:hover {
         background: rgba(255, 255, 255, 0.2);
       }

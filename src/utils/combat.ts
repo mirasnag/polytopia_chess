@@ -17,8 +17,8 @@ export function calculateDamage(
   return Math.max(0, baseDamage + attack - defense);
 }
 
-export function getValidAttacks(state: GameState, unit: Unit): Tile[] {
-  const validAttacks = [] as Tile[];
+export function getValidAttacks(state: GameState, unit: Unit): Set<Tile> {
+  const validAttacks = new Set<Tile>();
 
   const { range } = getUnitBaseStats(unit.type);
   const { x, y } = unit.position;
@@ -32,11 +32,11 @@ export function getValidAttacks(state: GameState, unit: Unit): Tile[] {
 
   for (let nx = minX; nx <= maxX; nx++) {
     for (let ny = minY; ny <= maxY; ny++) {
-      const anotherUnitId = tiles[nx][ny].occupantId;
+      const anotherUnitId = tiles[ny][nx].occupantId;
       if (!anotherUnitId) continue;
 
       if (units[anotherUnitId].ownerId !== unit.ownerId) {
-        validAttacks.push(tiles[ny][nx]);
+        validAttacks.add(tiles[ny][nx]);
       }
     }
   }
