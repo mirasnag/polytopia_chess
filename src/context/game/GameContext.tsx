@@ -1,18 +1,14 @@
-// main library
-import {
-  createContext,
-  useContext,
-  useReducer,
-  type Dispatch,
-  type ReactNode,
-} from "react";
+// hooks
+import { createContext, useContext, useEffect, useReducer } from "react";
 
 // types
+import type { Dispatch, ReactNode } from "react";
 import type { GameState, PlayerInGame } from "@/types/game";
 
 // helpers
 import { gameReducer, type GameAction } from "./gameReducer";
 import { createInitialGameState } from "./helpers";
+import { gameManager } from "@/managers/gameManager";
 
 export const GameContext = createContext<{
   state: GameState;
@@ -28,12 +24,20 @@ interface GameProviderProps {
   children: ReactNode;
 }
 
+const initGameState = (): GameState => {
+  if (gameManager.hasSavedGame()) {
+    return gameManager.load() ?? createInitialGameState();
+  }
+
+  return createInitialGameState();
+};
+
 export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
-  const [state, dispatch] = useReducer(
-    gameReducer,
-    undefined,
-    createInitialGameState
-  );
+  const [state, dispatch] = useReducer(gameReducer, undefined, initGameState);
+
+  useEffect(() => {
+    gameManager.save(state);
+  }, [state]);
 
   const value = {
     state: state,
