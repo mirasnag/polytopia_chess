@@ -8,6 +8,8 @@ import type { Tile } from "@/types/tile";
 export function getValidMoves(state: GameState, unit: Unit): Set<Tile> {
   const validMoves = new Set<Tile>();
 
+  if (state.outcome.status === "finished") return validMoves;
+
   const { movement } = getUnitBaseStats(unit.type);
   const { x, y } = unit.position;
   const { width, height, tiles } = state.map;

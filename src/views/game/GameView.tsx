@@ -7,12 +7,13 @@ import GameBoard from "@/components/game/GameBoard";
 import HUD from "@/components/game/HUD";
 import BackButton from "@/components/game/BackButton";
 import MenuButtons from "@/components/game/MenuButtons";
+import GameOutcomeModal from "@/components/game/GameOutcomeModal";
 
 // styles
 import classes from "./GameView.module.scss";
 
 const GameView = () => {
-  const { state } = useGame();
+  const { state, outcome } = useGame();
 
   useEffect(() => {
     const logGameState = () => {
@@ -40,6 +41,7 @@ const GameView = () => {
       <div className={classes.boardContainer}>
         <GameBoard />
       </div>
+      {outcome.status === "finished" && <GameOutcomeModal />}
     </div>
   );
 };

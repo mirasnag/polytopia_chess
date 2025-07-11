@@ -20,6 +20,8 @@ export function calculateDamage(
 export function getValidAttacks(state: GameState, unit: Unit): Set<Tile> {
   const validAttacks = new Set<Tile>();
 
+  if (state.outcome.status === "finished") return validAttacks;
+
   const { range } = getUnitBaseStats(unit.type);
   const { x, y } = unit.position;
   const { width, height, tiles } = state.map;

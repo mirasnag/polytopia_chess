@@ -11,28 +11,24 @@ import type { GameState } from "@/types/game";
 import type { UnitId } from "@/types/id";
 
 export type GameAction =
-  | { type: "Create"; payload: never }
+  | { type: "Create" }
   | { type: "Move"; payload: { unitId: UnitId; to: { x: number; y: number } } }
   | {
       type: "Attack";
       payload: { attackingUnitId: UnitId; defendingUnitId: UnitId };
     }
-  | { type: "Resign"; payload: never };
+  | { type: "Resign" };
 
 export function gameReducer(state: GameState, action: GameAction): GameState {
-  const { type, payload } = action;
-
-  switch (type) {
+  switch (action.type) {
     case "Create":
       return createInitialGameState();
     case "Move":
-      return moveUnit(state, payload.unitId, payload.to.x, payload.to.y);
+      const { unitId, to } = action.payload;
+      return moveUnit(state, unitId, to.x, to.y);
     case "Attack":
-      return attackUnit(
-        state,
-        payload.attackingUnitId,
-        payload.defendingUnitId
-      );
+      const { attackingUnitId, defendingUnitId } = action.payload;
+      return attackUnit(state, attackingUnitId, defendingUnitId);
     case "Resign":
       return resign(state);
 
