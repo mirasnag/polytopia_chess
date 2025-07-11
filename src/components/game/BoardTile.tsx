@@ -3,12 +3,13 @@ import { useGame } from "@/context/game/GameContext";
 
 // components
 import UnitView from "@/components/unit/UnitView";
+import TileCircle from "./TileCircle";
 
 // types
 import type { Tile } from "@/types/tile";
 
 // styles
-import classes from "./GameBoard.module.scss";
+import classes from "./BoardTile.module.scss";
 
 interface TileState {
   isActive: boolean;
@@ -29,13 +30,17 @@ const BoardTile: React.FC<Props> = ({ tile, handleTileClick, tileState }) => {
 
   const tileClassName = `${classes.tile} ${isActive ? classes.active : ""} ${
     isValidAttack ? classes.validAttack : ""
-  } ${isValidMove ? classes.validMove : ""} ${
-    currentPlayer.id === tileUnit?.ownerId ? classes.hasReadyUnit : ""
   }`;
 
   return (
     <div className={tileClassName} onClick={() => handleTileClick(tile)}>
-      {tileUnit && <UnitView unit={tileUnit} />}
+      {tileUnit && (
+        <UnitView
+          unit={tileUnit}
+          isReady={currentPlayer.id === tileUnit.ownerId}
+        />
+      )}
+      {isValidMove && <TileCircle type="move" />}
     </div>
   );
 };
