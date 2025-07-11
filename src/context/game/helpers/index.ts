@@ -7,6 +7,8 @@ import {
 } from "./map";
 import { createUnits } from "./units";
 import { advanceTurn, getInitialTurn } from "./turn";
+import { kingCaptureOutcome, resignOutcome } from "./outcome";
+import { isKing, schemaVersion } from "./common";
 
 // utils
 import { calculateDamage } from "@/utils/combat";
@@ -15,7 +17,6 @@ import { createBrandedId } from "@/utils/common";
 // types
 import type { GameState } from "@/types/game";
 import type { UnitId } from "@/types/id";
-import { schemaVersion } from "./common";
 
 export function createInitialGameState(): GameState {
   const playerA = createBrandedId("player");
@@ -27,15 +28,15 @@ export function createInitialGameState(): GameState {
     [playerA]: { id: playerA, name: "A" },
     [playerB]: { id: playerB, name: "B" },
   };
-  const turns = getInitialTurn(players);
+  const updatedTurn = getInitialTurn(players);
 
   return {
     schemaVersion: schemaVersion,
     players: players,
-    turn: turns,
     units: units,
     map: map,
-    isFinished: false,
+    turn: updatedTurn,
+    outcome: { status: "ongoing" },
   };
 }
 
@@ -87,12 +88,17 @@ export function attackUnit(
 
   const updatedTurn = advanceTurn(state.turn);
 
+  // defending unit is killed
   if (damage >= defendingUnit.hp) {
     const { [defendingUnitId]: _, ...remainingUnits } = state.units;
     const updatedTiles = removeTileOccupant(
       state.map.tiles,
       defendingUnit.position
     );
+
+    const updatedOutcome = isKing(defendingUnit)
+      ? kingCaptureOutcome(attackingUnit.ownerId)
+      : { ...state.outcome };
 
     return {
       ...state,
@@ -102,6 +108,7 @@ export function attackUnit(
         tiles: updatedTiles,
       },
       turn: updatedTurn,
+      outcome: updatedOutcome,
     };
   }
 
@@ -115,5 +122,15 @@ export function attackUnit(
       },
     },
     turn: updatedTurn,
+  };
+}
+
+export function resign(state: GameState): GameState {
+  const currentPlayerId = state.turn.playerOrder[state.turn.orderIndex];
+  const updatedOutcome = resignOutcome(state.players, currentPlayerId);
+
+  return {
+    ...state,
+    outcome: updatedOutcome,
   };
 }

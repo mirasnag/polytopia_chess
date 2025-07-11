@@ -26,14 +26,22 @@ export interface Turn {
   orderIndex: number;
 }
 
+export type GameOutcome =
+  | { status: "ongoing" }
+  | {
+      status: "finished";
+      winnerId: PlayerId;
+      reason: "resign" | "kingCaptured";
+    };
+
 export interface GameState {
   schemaVersion: {
     major: number;
     minor: number;
   };
   players: Players;
-  turn: Turn;
   units: Units;
   map: MapGrid;
-  isFinished: boolean;
+  turn: Turn;
+  outcome: GameOutcome;
 }

@@ -16,6 +16,7 @@ export const GameContext = createContext<{
   tiles: GameState["map"]["tiles"];
   turn: GameState["turn"];
   players: GameState["players"];
+  outcome: GameState["outcome"];
   currentPlayer: PlayerInGame;
   dispatch: Dispatch<GameAction>;
 } | null>(null);
@@ -45,6 +46,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     units: state.units,
     tiles: state.map.tiles,
     turn: state.turn,
+    outcome: state.outcome,
     players: state.players,
     currentPlayer: state.players[state.turn.playerOrder[state.turn.orderIndex]],
   };

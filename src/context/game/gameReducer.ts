@@ -1,5 +1,10 @@
 // helpers
-import { attackUnit, createInitialGameState, moveUnit } from "./helpers";
+import {
+  attackUnit,
+  createInitialGameState,
+  moveUnit,
+  resign,
+} from "./helpers";
 
 // types
 import type { GameState } from "@/types/game";
@@ -11,7 +16,8 @@ export type GameAction =
   | {
       type: "Attack";
       payload: { attackingUnitId: UnitId; defendingUnitId: UnitId };
-    };
+    }
+  | { type: "Resign"; payload: never };
 
 export function gameReducer(state: GameState, action: GameAction): GameState {
   const { type, payload } = action;
@@ -27,6 +33,8 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         payload.attackingUnitId,
         payload.defendingUnitId
       );
+    case "Resign":
+      return resign(state);
 
     default:
       return state;
