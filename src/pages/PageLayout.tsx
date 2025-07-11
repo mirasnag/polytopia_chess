@@ -2,7 +2,7 @@
 import { Outlet } from "react-router-dom";
 
 // components
-import StarfieldBackground from "@/components/StarfieldBackground";
+import StarfieldBackground from "@/components/utils/StarfieldBackground";
 
 const PageLayout = () => {
   return (
