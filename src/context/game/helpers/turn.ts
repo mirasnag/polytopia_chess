@@ -1,12 +1,14 @@
 import type { Players, Turn } from "@/types/game";
 import type { PlayerId } from "@/types/id";
+import { shuffleArray } from "@/utils/common";
 
 export function getInitialTurn(players: Players): Turn {
   const order = Object.keys(players) as PlayerId[];
+  const shuffledOrder = shuffleArray(order);
 
   return {
-    counter: 0,
-    playerOrder: order,
+    counter: 1,
+    playerOrder: shuffledOrder,
     orderIndex: 0,
   };
 }
