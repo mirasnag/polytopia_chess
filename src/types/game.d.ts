@@ -1,7 +1,7 @@
 // types
 import type { GameId, PlayerId, UnitId } from "@/types/id";
 import type { MapGrid } from "@/types/tile";
-import { UnitType } from "@/types/unit";
+import { UnitType, type ActionKey, type UnitSkillKey } from "@/types/unit";
 
 export interface PlayerInGame {
   id: PlayerId;
@@ -24,6 +24,10 @@ export interface Turn {
   counter: number;
   playerOrder: PlayerId[];
   orderIndex: number;
+
+  actionPointsTotal: number;
+  actionPointsRemaining: number;
+  actionsByUnit: Record<UnitId, Set<ActionKey>>;
 }
 
 export type GameOutcome =

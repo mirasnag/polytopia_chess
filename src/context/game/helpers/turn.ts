@@ -2,6 +2,8 @@ import type { Players, Turn } from "@/types/game";
 import type { PlayerId } from "@/types/id";
 import { shuffleArray } from "@/utils/common";
 
+const basePoints = 3;
+
 export function getInitialTurn(players: Players): Turn {
   const order = Object.keys(players) as PlayerId[];
   const shuffledOrder = shuffleArray(order);
@@ -10,6 +12,9 @@ export function getInitialTurn(players: Players): Turn {
     counter: 1,
     playerOrder: shuffledOrder,
     orderIndex: 0,
+    actionPointsTotal: basePoints,
+    actionPointsRemaining: basePoints,
+    actionsByUnit: {},
   };
 }
 
@@ -23,5 +28,8 @@ export function advanceTurn(turn: Turn): Turn {
     ...turn,
     counter: nextCounter,
     orderIndex: nextOrderIndex,
+    actionPointsTotal: basePoints,
+    actionPointsRemaining: basePoints,
+    actionsByUnit: {},
   };
 }
