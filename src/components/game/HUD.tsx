@@ -2,11 +2,18 @@ import { useGame } from "@/context/game/GameContext";
 import classes from "./HUD.module.scss";
 
 const HUD = () => {
-  const { state } = useGame();
+  const { players, turn } = useGame();
 
-  const { counter, playerOrder, orderIndex } = state.turn;
+  const {
+    counter,
+    playerOrder,
+    orderIndex,
+    actionPointsRemaining,
+    actionPointsTotal,
+  } = turn;
+
   const currentPlayerId = playerOrder[orderIndex];
-  const { name: currentPlayerName } = state.players[currentPlayerId];
+  const { name: currentPlayerName } = players[currentPlayerId];
 
   return (
     <div className={classes.layout}>
@@ -17,6 +24,9 @@ const HUD = () => {
       <h3 className={classes.text}>
         Player:
         <span className={classes.highlightText}> {currentPlayerName}</span>
+      </h3>
+      <h3 className={classes.text}>
+        Action Points: {actionPointsRemaining} / {actionPointsTotal}
       </h3>
     </div>
   );

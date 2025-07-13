@@ -5,10 +5,15 @@ import { getUnitBaseStats } from "@/data/unitBaseStats";
 import type { GameState, Unit } from "@/types/game";
 import type { Tile } from "@/types/tile";
 
+// utils
+import { canDoAction } from "./action";
+
 export function getValidMoves(state: GameState, unit: Unit): Set<Tile> {
   const validMoves = new Set<Tile>();
 
   if (state.outcome.status === "finished") return validMoves;
+
+  if (!canDoAction(unit.id, "move", state.turn)) return validMoves;
 
   const { movement } = getUnitBaseStats(unit.type);
   const { x, y } = unit.position;

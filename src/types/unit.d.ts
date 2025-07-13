@@ -19,7 +19,7 @@ export type SkillActionKey =
 
 export type BasicActionKey = "move" | "attack";
 
-export type ActionKey = SkillActionKey | BasicActionKey;
+export type UnitActionKey = SkillActionKey | BasicActionKey;
 
 export interface UnitAction {
   description: string;

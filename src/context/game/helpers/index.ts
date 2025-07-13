@@ -6,7 +6,7 @@ import {
   removeTileOccupant,
 } from "./map";
 import { createUnits } from "./units";
-import { advanceTurn, getInitialTurn } from "./turn";
+import { advanceTurn, getInitialTurn, registerUnitAction } from "./turn";
 import { kingCaptureOutcome, resignOutcome } from "./outcome";
 import { isKing, schemaVersion } from "./common";
 
@@ -64,7 +64,7 @@ export function moveUnit(
     { x, y }
   );
 
-  const updatedTurn = advanceTurn(state.turn);
+  const updatedTurn = registerUnitAction(state.turn, unitId, "move");
 
   return {
     ...state,
@@ -85,8 +85,7 @@ export function attackUnit(
   const attackingUnit = state.units[attackingUnitId];
   const defendingUnit = state.units[defendingUnitId];
   const damage = calculateDamage(attackingUnit, defendingUnit);
-
-  const updatedTurn = advanceTurn(state.turn);
+  const updatedTurn = registerUnitAction(state.turn, attackingUnitId, "attack");
 
   // defending unit is killed
   if (damage >= defendingUnit.hp) {
@@ -107,8 +106,8 @@ export function attackUnit(
         ...state.map,
         tiles: updatedTiles,
       },
-      turn: updatedTurn,
       outcome: updatedOutcome,
+      turn: updatedTurn,
     };
   }
 
@@ -132,5 +131,14 @@ export function resign(state: GameState): GameState {
   return {
     ...state,
     outcome: updatedOutcome,
+  };
+}
+
+export function advance(state: GameState): GameState {
+  const updatedTurn = advanceTurn(state.turn);
+
+  return {
+    ...state,
+    turn: updatedTurn,
   };
 }

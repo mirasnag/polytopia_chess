@@ -1,5 +1,12 @@
+// data
+import { UNIT_ACTIONS } from "@/data/unitActions";
+
+// types
 import type { Players, Turn } from "@/types/game";
-import type { PlayerId } from "@/types/id";
+import type { PlayerId, UnitId } from "@/types/id";
+import type { UnitActionKey } from "@/types/unit";
+
+// utils
 import { shuffleArray } from "@/utils/common";
 
 const basePoints = 3;
@@ -31,5 +38,24 @@ export function advanceTurn(turn: Turn): Turn {
     actionPointsTotal: basePoints,
     actionPointsRemaining: basePoints,
     actionsByUnit: {},
+  };
+}
+
+export function registerUnitAction(
+  turn: Turn,
+  unitId: UnitId,
+  key: UnitActionKey
+): Turn {
+  const cost = UNIT_ACTIONS[key].cost;
+
+  const unitActions = new Set(turn.actionsByUnit[unitId]).add(key);
+
+  return {
+    ...turn,
+    actionPointsRemaining: turn.actionPointsRemaining - cost,
+    actionsByUnit: {
+      ...turn.actionsByUnit,
+      [unitId]: unitActions,
+    },
   };
 }

@@ -5,6 +5,9 @@ import { getUnitBaseStats } from "@/data/unitBaseStats";
 import type { GameState, Unit } from "@/types/game";
 import type { Tile } from "@/types/tile";
 
+// utils
+import { canDoAction } from "./action";
+
 const baseDamage = 5;
 
 export function calculateDamage(
@@ -21,6 +24,8 @@ export function getValidAttacks(state: GameState, unit: Unit): Set<Tile> {
   const validAttacks = new Set<Tile>();
 
   if (state.outcome.status === "finished") return validAttacks;
+
+  if (!canDoAction(unit.id, "attack", state.turn)) return validAttacks;
 
   const { range } = getUnitBaseStats(unit.type);
   const { x, y } = unit.position;

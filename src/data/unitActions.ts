@@ -1,6 +1,6 @@
-import type { ActionKey, UnitAction } from "@/types/unit";
+import type { UnitActionKey, UnitAction } from "@/types/unit";
 
-export const UNIT_ACTIONS: Record<ActionKey, UnitAction> = {
+export const UNIT_ACTIONS: Record<UnitActionKey, UnitAction> = {
   move: {
     description: "Move unit",
     type: "basic",

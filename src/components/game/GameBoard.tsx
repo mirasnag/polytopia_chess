@@ -53,7 +53,7 @@ const GameBoard = () => {
         throw new Error("Cannot move unit - tile is occupied!");
 
       dispatch({
-        type: "Move",
+        type: "move",
         payload: { unitId: activeUnit.id, to: { x: tile.x, y: tile.y } },
       });
       setActiveTile(null);
@@ -65,7 +65,7 @@ const GameBoard = () => {
         throw new Error("Cannot attack unit - tile is not occupied!");
 
       dispatch({
-        type: "Attack",
+        type: "attack",
         payload: {
           attackingUnitId: activeUnit.id,
           defendingUnitId: tile.occupantId,

@@ -13,9 +13,20 @@ const MenuButtons = () => {
     });
   };
 
+  const handleDoneButtonClick = () => {
+    dispatch({
+      type: "Advance",
+    });
+  };
+
   return (
     <div className={classes.layout}>
-      <button onClick={handleResignButtonClick}>Resign</button>
+      <button className={classes.button} onClick={handleResignButtonClick}>
+        Resign
+      </button>
+      <button className={classes.button} onClick={handleDoneButtonClick}>
+        Done
+      </button>
     </div>
   );
 };
