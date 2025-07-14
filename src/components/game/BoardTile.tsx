@@ -2,7 +2,7 @@
 import { useGame } from "@/context/game/GameContext";
 
 // components
-import UnitView from "@/components/unit/UnitView";
+import UnitTileView from "@/components/unit/UnitTileView";
 import TileCircle from "./TileCircle";
 
 // types
@@ -35,7 +35,7 @@ const BoardTile: React.FC<Props> = ({ tile, handleTileClick, tileState }) => {
   return (
     <div className={tileClassName} onClick={() => handleTileClick(tile)}>
       {tileUnit && (
-        <UnitView
+        <UnitTileView
           unit={tileUnit}
           isReady={currentPlayer.id === tileUnit.ownerId}
         />

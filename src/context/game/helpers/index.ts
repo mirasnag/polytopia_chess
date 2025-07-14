@@ -97,8 +97,6 @@ export function attackReducer(
     ? kingCaptureOutcome(attackingUnit.ownerId)
     : { ...state.outcome };
 
-  console.log("Reducer update: ", Array.isArray(updatedTiles));
-
   return {
     ...state,
     units: updatedUnits,
