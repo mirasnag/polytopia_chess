@@ -7,7 +7,7 @@ import type { GameState, PlayerInGame } from "@/types/game";
 
 // helpers
 import { gameReducer, type GameAction } from "./gameReducer";
-import { createInitialGameState } from "./helpers";
+import { createReducer } from "./helpers";
 import { gameManager } from "@/managers/gameManager";
 
 export const GameContext = createContext<{
@@ -27,10 +27,10 @@ interface GameProviderProps {
 
 const initGameState = (): GameState => {
   if (gameManager.hasSavedGame()) {
-    return gameManager.load() ?? createInitialGameState();
+    return gameManager.load() ?? createReducer();
   }
 
-  return createInitialGameState();
+  return createReducer();
 };
 
 export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {

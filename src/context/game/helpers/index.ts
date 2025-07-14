@@ -1,24 +1,24 @@
 // helpers
 import {
   applyUnitsToMap,
+  copyTiles,
   createMap,
   moveTileOccupant,
   removeTileOccupant,
 } from "./map";
-import { createUnits } from "./units";
+import { createUnits, attackUnit, moveUnit, resetAllUnitState } from "./units";
 import { advanceTurn, getInitialTurn, registerUnitAction } from "./turn";
 import { kingCaptureOutcome, resignOutcome } from "./outcome";
 import { isKing, schemaVersion } from "./common";
 
 // utils
-import { calculateDamage } from "@/utils/combat.util";
 import { createBrandedId } from "@/utils/common.util";
 
 // types
 import type { GameState } from "@/types/game";
 import type { UnitId } from "@/types/id";
 
-export function createInitialGameState(): GameState {
+export function createReducer(): GameState {
   const playerA = createBrandedId("player");
   const playerB = createBrandedId("player");
 
@@ -40,7 +40,7 @@ export function createInitialGameState(): GameState {
   };
 }
 
-export function moveUnit(
+export function moveReducer(
   state: GameState,
   unitId: UnitId,
   x: number,
@@ -49,13 +49,7 @@ export function moveUnit(
   const unit = state.units[unitId];
   const { x: oldX, y: oldY } = unit.position;
 
-  const updatedUnits = {
-    ...state.units,
-    [unitId]: {
-      ...unit,
-      position: { x, y },
-    },
-  };
+  const updatedUnits = moveUnit(state.units, unitId, { x, y });
 
   const updatedTiles = moveTileOccupant(
     state.map.tiles,
@@ -77,54 +71,47 @@ export function moveUnit(
   };
 }
 
-export function attackUnit(
+export function attackReducer(
   state: GameState,
   attackingUnitId: UnitId,
   defendingUnitId: UnitId
 ): GameState {
   const attackingUnit = state.units[attackingUnitId];
   const defendingUnit = state.units[defendingUnitId];
-  const damage = calculateDamage(attackingUnit, defendingUnit);
+
   const updatedTurn = registerUnitAction(state.turn, attackingUnitId, "attack");
 
-  // defending unit is killed
-  if (damage >= defendingUnit.hp) {
-    const { [defendingUnitId]: _, ...remainingUnits } = state.units;
-    const updatedTiles = removeTileOccupant(
-      state.map.tiles,
-      defendingUnit.position
-    );
+  const updatedUnits = attackUnit(
+    state.units,
+    attackingUnitId,
+    defendingUnitId
+  );
+  const isKilled = updatedUnits[defendingUnitId] === undefined;
 
-    const updatedOutcome = isKing(defendingUnit)
-      ? kingCaptureOutcome(attackingUnit.ownerId)
-      : { ...state.outcome };
+  const updatedTiles = isKilled
+    ? removeTileOccupant(state.map.tiles, defendingUnit.position)
+    : copyTiles(state.map.tiles);
 
-    return {
-      ...state,
-      units: remainingUnits,
-      map: {
-        ...state.map,
-        tiles: updatedTiles,
-      },
-      outcome: updatedOutcome,
-      turn: updatedTurn,
-    };
-  }
+  const isKingKilled = isKing(defendingUnit) && isKilled;
+  const updatedOutcome = isKingKilled
+    ? kingCaptureOutcome(attackingUnit.ownerId)
+    : { ...state.outcome };
+
+  console.log("Reducer update: ", Array.isArray(updatedTiles));
 
   return {
     ...state,
-    units: {
-      ...state.units,
-      [defendingUnitId]: {
-        ...defendingUnit,
-        hp: defendingUnit.hp - damage,
-      },
+    units: updatedUnits,
+    map: {
+      ...state.map,
+      tiles: updatedTiles,
     },
     turn: updatedTurn,
+    outcome: updatedOutcome,
   };
 }
 
-export function resign(state: GameState): GameState {
+export function resignReducer(state: GameState): GameState {
   const currentPlayerId = state.turn.playerOrder[state.turn.orderIndex];
   const updatedOutcome = resignOutcome(state.players, currentPlayerId);
 
@@ -134,11 +121,13 @@ export function resign(state: GameState): GameState {
   };
 }
 
-export function advance(state: GameState): GameState {
+export function advanceReducer(state: GameState): GameState {
   const updatedTurn = advanceTurn(state.turn);
+  const updatedUnits = resetAllUnitState(state.units);
 
   return {
     ...state,
     turn: updatedTurn,
+    units: updatedUnits,
   };
 }

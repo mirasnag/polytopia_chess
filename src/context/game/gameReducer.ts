@@ -1,10 +1,10 @@
 // helpers
 import {
-  advance,
-  attackUnit,
-  createInitialGameState,
-  moveUnit,
-  resign,
+  advanceReducer,
+  attackReducer,
+  createReducer,
+  moveReducer,
+  resignReducer,
 } from "./helpers";
 import type { PayloadFor } from "./helpers/actionPayload";
 
@@ -23,17 +23,17 @@ export type GameAction =
 export function gameReducer(state: GameState, action: GameAction): GameState {
   switch (action.type) {
     case "Create":
-      return createInitialGameState();
+      return createReducer();
     case "Resign":
-      return resign(state);
+      return resignReducer(state);
     case "Advance":
-      return advance(state);
+      return advanceReducer(state);
     case "move":
       const { unitId, to } = action.payload;
-      return moveUnit(state, unitId, to.x, to.y);
+      return moveReducer(state, unitId, to.x, to.y);
     case "attack":
       const { attackingUnitId, defendingUnitId } = action.payload;
-      return attackUnit(state, attackingUnitId, defendingUnitId);
+      return attackReducer(state, attackingUnitId, defendingUnitId);
 
     default:
       return state;

@@ -1,11 +1,12 @@
 // utils
 import { createBrandedId } from "@/utils/common.util";
-import { getUnitBaseStats } from "@/data/unitBaseStats";
+import { getUnitBaseStats, getUnitSkills } from "@/data/unitBaseStats";
 
 // types
-import type { Units } from "@/types/game";
-import type { PlayerId } from "@/types/id";
+import type { Unit, Units } from "@/types/game";
+import type { PlayerId, UnitId } from "@/types/id";
 import type { UnitType } from "@/types/unit";
+import { calculateDamage } from "@/utils/combat.util";
 
 const edgeRowUnits: UnitType[] = [
   "catapult",
@@ -44,7 +45,9 @@ function placeRowUnits(
       type: unitType,
       ownerId: owner,
       position: { x: col, y: row },
-      hp: getUnitBaseStats(unitType).hp,
+      stats: getUnitBaseStats(unitType),
+      canAttack: true,
+      canMove: true,
     };
   }
 }
@@ -59,4 +62,84 @@ export function createUnits(playerA: PlayerId, playerB: PlayerId): Units {
   placeRowUnits(units, playerB, warriorRowUnits, 6);
 
   return units;
+}
+
+function resetUnitState(unit: Unit): Unit {
+  const baseStats = getUnitBaseStats(unit.type);
+
+  return {
+    ...unit,
+    canMove: true,
+    canAttack: true,
+    stats: {
+      ...baseStats,
+      hp: unit.stats.hp,
+    },
+  };
+}
+
+export function resetAllUnitState(units: Units): Units {
+  const updatedUnits = Object.fromEntries(
+    Object.entries(units).map(([id, unit]) => [id, resetUnitState(unit)])
+  );
+
+  return updatedUnits;
+}
+
+export function moveUnit(
+  units: Units,
+  movingUnitId: UnitId,
+  to: { x: number; y: number }
+): Units {
+  const skills = getUnitSkills(units[movingUnitId].type);
+
+  const movingUnit = {
+    ...units[movingUnitId],
+    canAttack: skills.includes("dash"),
+    canMove: false,
+    position: to,
+  };
+
+  return {
+    ...units,
+    [movingUnitId]: movingUnit,
+  };
+}
+
+export function attackUnit(
+  units: Units,
+  attackingUnitId: UnitId,
+  defendingUnitId: UnitId
+): Units {
+  const attackingUnit = units[attackingUnitId];
+  const defendingUnit = units[defendingUnitId];
+
+  const damage = calculateDamage(attackingUnit, defendingUnit);
+
+  const isKilled = defendingUnit.stats.hp <= damage;
+
+  const skills = getUnitSkills(attackingUnit.type);
+
+  const updatedUnits: Units = {
+    ...units,
+    [attackingUnitId]: {
+      ...attackingUnit,
+      canAttack: skills.includes("persistant"),
+      canMove: skills.includes("escape"),
+    },
+  };
+
+  if (!isKilled) {
+    updatedUnits[defendingUnitId] = {
+      ...defendingUnit,
+      stats: {
+        ...defendingUnit.stats,
+        hp: defendingUnit.stats.hp - damage,
+      },
+    };
+  } else {
+    delete updatedUnits[defendingUnitId];
+  }
+
+  return updatedUnits;
 }
