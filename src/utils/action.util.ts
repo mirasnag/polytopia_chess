@@ -2,12 +2,18 @@
 import { UNIT_ACTIONS } from "@/data/unitActions";
 
 // types
-import type { Turn } from "@/types/game";
-import type { UnitId } from "@/types/id";
-import type { UnitActionKey } from "@/types/unit";
+import type { Turn, Unit } from "@/types/game";
+import type {
+  AttackActionKey,
+  MoveActionKey,
+  UnitActionKey,
+} from "@/types/unit";
+
+const moveActionKey: MoveActionKey = "move";
+const attackActionKey: AttackActionKey = "attack";
 
 export function canDoAction(
-  unitId: UnitId,
+  unit: Unit,
   actionKey: UnitActionKey,
   turn: Turn
 ): boolean {
@@ -16,9 +22,27 @@ export function canDoAction(
 
   if (actionPointsRemaining < actionCost) return false;
 
-  if (!actionsByUnit[unitId]) return true;
+  if (!actionsByUnit[unit.id]) return true;
 
-  if (actionsByUnit[unitId].has(actionKey)) return false;
+  if (actionsByUnit[unit.id].has(actionKey)) return false;
 
   return true;
+}
+
+export function canMove(unit: Unit, turn: Turn): boolean {
+  const { actionPointsRemaining } = turn;
+  const actionCost = UNIT_ACTIONS[moveActionKey].cost;
+
+  if (actionPointsRemaining < actionCost) return false;
+
+  return unit.canMove;
+}
+
+export function canAttack(unit: Unit, turn: Turn): boolean {
+  const { actionPointsRemaining } = turn;
+  const actionCost = UNIT_ACTIONS[attackActionKey].cost;
+
+  if (actionPointsRemaining < actionCost) return false;
+
+  return unit.canAttack;
 }

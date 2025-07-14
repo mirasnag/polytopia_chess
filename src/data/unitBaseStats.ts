@@ -59,3 +59,6 @@ export const getAllUnitBaseStats = () => UNIT_BASE_STATS;
 
 export const getUnitBaseStats = (unitType: UnitType) =>
   UNIT_BASE_STATS[unitType];
+
+export const getUnitSkills = (unitType: UnitType) =>
+  UNIT_BASE_STATS[unitType].skills ?? [];

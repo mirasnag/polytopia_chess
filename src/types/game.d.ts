@@ -1,7 +1,12 @@
 // types
 import type { GameId, PlayerId, UnitId } from "@/types/id";
 import type { MapGrid } from "@/types/tile";
-import { UnitType, type ActionKey, type UnitSkillKey } from "@/types/unit";
+import {
+  UnitType,
+  type ActionKey,
+  type UnitSkillKey,
+  type UnitStats,
+} from "@/types/unit";
 
 export interface PlayerInGame {
   id: PlayerId;
@@ -15,7 +20,9 @@ export interface Unit {
   type: UnitType;
   ownerId: PlayerId;
   position: { x: number; y: number };
-  hp: number;
+  stats: UnitStats;
+  canAttack: boolean;
+  canMove: boolean;
 }
 
 export type Units = Record<UnitId, Unit>;

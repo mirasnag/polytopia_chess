@@ -17,7 +17,10 @@ export type SkillActionKey =
   | "multiAttack"
   | "longShot";
 
-export type BasicActionKey = "move" | "attack";
+export type MoveActionKey = "move";
+export type AttackActionKey = "attack";
+
+export type BasicActionKey = MoveActionKey | AttackActionKey;
 
 export type UnitActionKey = SkillActionKey | BasicActionKey;
 

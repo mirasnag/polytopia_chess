@@ -8,7 +8,7 @@ export function prettyLogUnits(state: GameState): void {
     // Owner: u.ownerId,
     X: u.position.x,
     Y: u.position.y,
-    HP: u.hp,
+    HP: u.stats.hp,
   }));
 
   console.groupCollapsed(`Units (${rows.length})`);

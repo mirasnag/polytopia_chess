@@ -15,10 +15,16 @@ export function createMap(width: number = 8, height: number = 8): MapGrid {
   return { width, height, tiles };
 }
 
-export function applyUnitsToMap(map: MapGrid, units: Units): MapGrid {
-  const tiles = map.tiles.map(
+export function copyTiles(tiles: Tile[][]): Tile[][] {
+  const tileCopy = tiles.map(
     (row) => row.map((tile) => ({ ...tile })) // shallow‑copy every tile
   );
+
+  return tileCopy;
+}
+
+export function applyUnitsToMap(map: MapGrid, units: Units): MapGrid {
+  const tiles = copyTiles(map.tiles);
   Object.values(units).forEach((u) => {
     tiles[u.position.y][u.position.x].occupantId = u.id;
   });
@@ -31,7 +37,7 @@ export function moveTileOccupant(
   from: { x: number; y: number },
   to: { x: number; y: number }
 ): Tile[][] {
-  const updatedTiles = tiles.map((row) => row.map((tile) => ({ ...tile })));
+  const updatedTiles = copyTiles(tiles);
   updatedTiles[from.y][from.x].occupantId = undefined;
   updatedTiles[to.y][to.x].occupantId = unitId;
 
@@ -42,7 +48,7 @@ export function removeTileOccupant(
   tiles: Tile[][],
   pos: { x: number; y: number }
 ): Tile[][] {
-  const updatedTiles = tiles.map((row) => row.map((tile) => ({ ...tile })));
+  const updatedTiles = copyTiles(tiles);
 
   updatedTiles[pos.y][pos.x].occupantId = undefined;
 

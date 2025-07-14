@@ -17,7 +17,7 @@ const UnitView: React.FC<Props> = ({ unit, isReady = false }) => {
 
   return (
     <div className={classes.container}>
-      <div className={classes.hp}>{unit.hp}</div>
+      <div className={classes.hp}>{unit.stats.hp}</div>
 
       <div className={classes.modelContainer}>
         <img

@@ -48,7 +48,7 @@ export function registerUnitAction(
 ): Turn {
   const cost = UNIT_ACTIONS[key].cost;
 
-  const unitActions = new Set(turn.actionsByUnit[unitId]).add(key);
+  const unitActions = new Set(turn.actionsByUnit[unitId] ?? []).add(key);
 
   return {
     ...turn,
