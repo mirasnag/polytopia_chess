@@ -6,7 +6,7 @@ import type { GameState, Unit } from "@/types/game";
 import type { Tile } from "@/types/tile";
 
 // utils
-import { canDoAction } from "./action";
+import { canDoAction } from "./action.util";
 
 const baseDamage = 5;
 

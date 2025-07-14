@@ -11,8 +11,8 @@ import { kingCaptureOutcome, resignOutcome } from "./outcome";
 import { isKing, schemaVersion } from "./common";
 
 // utils
-import { calculateDamage } from "@/utils/combat";
-import { createBrandedId } from "@/utils/common";
+import { calculateDamage } from "@/utils/combat.util";
+import { createBrandedId } from "@/utils/common.util";
 
 // types
 import type { GameState } from "@/types/game";

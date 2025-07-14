@@ -1,5 +1,5 @@
 // utils
-import { createBrandedId } from "@/utils/common";
+import { createBrandedId } from "@/utils/common.util";
 import { getUnitBaseStats } from "@/data/unitBaseStats";
 
 // types

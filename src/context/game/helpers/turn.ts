@@ -7,7 +7,7 @@ import type { PlayerId, UnitId } from "@/types/id";
 import type { UnitActionKey } from "@/types/unit";
 
 // utils
-import { shuffleArray } from "@/utils/common";
+import { shuffleArray } from "@/utils/common.util";
 
 const basePoints = 3;
 
