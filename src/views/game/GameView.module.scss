@@ -5,7 +5,7 @@
   display: grid;
   grid-template-areas:
     "back-button     hud     menu-buttons"
-    "board     board   board";
+    "left-panel     board   right-panel";
   grid-template-columns: 1fr 3fr 1fr;
   grid-template-rows: auto 1fr;
 

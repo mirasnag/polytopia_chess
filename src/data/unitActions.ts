@@ -38,7 +38,7 @@ export const UNIT_ACTIONS: Record<UnitActionKey, UnitAction> = {
     cost: 2,
   },
   longShot: {
-    description: "Increase +1 attack range this turn",
+    description: "Gain +1 attack range this turn",
     type: "active",
     cost: 2,
   },

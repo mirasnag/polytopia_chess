@@ -1,5 +1,5 @@
 // hooks
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useGame } from "@/context/game/GameContext";
 
 // components
@@ -15,10 +15,14 @@ import type { Tile } from "@/types/tile";
 // styles
 import classes from "./GameBoard.module.scss";
 
-const GameBoard = () => {
+interface Props {
+  activeTile: Tile | null;
+  setActiveTile: (newActiveTile: Tile | null) => void;
+}
+
+const GameBoard: React.FC<Props> = ({ activeTile, setActiveTile }) => {
   const { state, currentPlayer, tiles, units, dispatch } = useGame();
 
-  const [activeTile, setActiveTile] = useState<Tile | null>(null);
   const activeUnitId = activeTile?.occupantId;
 
   const activeUnit = useMemo(() => {
