@@ -1,6 +1,5 @@
 // types
 import type { Units } from "@/types/game";
-import type { UnitId } from "@/types/id";
 import type { MapGrid, Tile } from "@/types/tile";
 
 export function createMap(width: number = 8, height: number = 8): MapGrid {
@@ -33,13 +32,13 @@ export function applyUnitsToMap(map: MapGrid, units: Units): MapGrid {
 
 export function moveTileOccupant(
   tiles: Tile[][],
-  unitId: UnitId,
   from: { x: number; y: number },
   to: { x: number; y: number }
 ): Tile[][] {
   const updatedTiles = copyTiles(tiles);
+  const occupantId = updatedTiles[from.y][from.x].occupantId;
   updatedTiles[from.y][from.x].occupantId = undefined;
-  updatedTiles[to.y][to.x].occupantId = unitId;
+  updatedTiles[to.y][to.x].occupantId = occupantId;
 
   return updatedTiles;
 }
@@ -51,6 +50,19 @@ export function removeTileOccupant(
   const updatedTiles = copyTiles(tiles);
 
   updatedTiles[pos.y][pos.x].occupantId = undefined;
+
+  return updatedTiles;
+}
+
+export function replaceTileOccupant(
+  tiles: Tile[][],
+  from: { x: number; y: number },
+  to: { x: number; y: number }
+): Tile[][] {
+  const updatedTiles = copyTiles(tiles);
+  const occupantId = updatedTiles[from.y][from.x].occupantId;
+  updatedTiles[from.y][from.x].occupantId = undefined;
+  updatedTiles[to.y][to.x].occupantId = occupantId;
 
   return updatedTiles;
 }

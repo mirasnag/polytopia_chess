@@ -93,7 +93,7 @@ export function moveUnit(
   turn: Turn
 ): Units {
   const skills = getUnitSkills(units[movingUnitId].type);
-  const hasAttacked = turn.actionsByUnit[movingUnitId].has("attack");
+  const hasAttacked = turn.actionsByUnit[movingUnitId]?.has("attack") ?? false;
 
   const movingUnit = {
     ...units[movingUnitId],
@@ -126,6 +126,7 @@ export function attackUnit(
     ...units,
     [attackingUnitId]: {
       ...attackingUnit,
+      position: isKilled ? defendingUnit.position : attackingUnit.position,
       canAttack: isKilled && skills.includes("persistant"),
       canMove: skills.includes("escape"),
     },

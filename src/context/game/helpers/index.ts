@@ -5,6 +5,7 @@ import {
   createMap,
   moveTileOccupant,
   removeTileOccupant,
+  replaceTileOccupant,
 } from "./map";
 import { createUnits, attackUnit, moveUnit, resetAllUnitState } from "./units";
 import { advanceTurn, getInitialTurn, registerUnitAction } from "./turn";
@@ -43,20 +44,14 @@ export function createReducer(): GameState {
 export function moveReducer(
   state: GameState,
   unitId: UnitId,
-  x: number,
-  y: number
+  newPos: { x: number; y: number }
 ): GameState {
   const unit = state.units[unitId];
-  const { x: oldX, y: oldY } = unit.position;
+  const oldPos = unit.position;
 
-  const updatedUnits = moveUnit(state.units, unitId, { x, y }, state.turn);
+  const updatedUnits = moveUnit(state.units, unitId, newPos, state.turn);
 
-  const updatedTiles = moveTileOccupant(
-    state.map.tiles,
-    unitId,
-    { x: oldX, y: oldY },
-    { x, y }
-  );
+  const updatedTiles = moveTileOccupant(state.map.tiles, oldPos, newPos);
 
   const updatedTurn = registerUnitAction(state.turn, unitId, "move");
 
@@ -78,24 +73,33 @@ export function attackReducer(
 ): GameState {
   const attackingUnit = state.units[attackingUnitId];
   const defendingUnit = state.units[defendingUnitId];
-
-  const updatedTurn = registerUnitAction(state.turn, attackingUnitId, "attack");
+  const tiles = state.map.tiles;
 
   const updatedUnits = attackUnit(
     state.units,
     attackingUnitId,
     defendingUnitId
   );
+
   const isKilled = updatedUnits[defendingUnitId] === undefined;
+  const isMeleeRangedUnit = attackingUnit.stats.range === 1;
 
   const updatedTiles = isKilled
-    ? removeTileOccupant(state.map.tiles, defendingUnit.position)
-    : copyTiles(state.map.tiles);
+    ? isMeleeRangedUnit
+      ? replaceTileOccupant(
+          tiles,
+          attackingUnit.position,
+          defendingUnit.position
+        )
+      : removeTileOccupant(tiles, defendingUnit.position)
+    : copyTiles(tiles);
 
   const isKingKilled = isKing(defendingUnit) && isKilled;
   const updatedOutcome = isKingKilled
     ? kingCaptureOutcome(attackingUnit.ownerId)
     : { ...state.outcome };
+
+  const updatedTurn = registerUnitAction(state.turn, attackingUnitId, "attack");
 
   return {
     ...state,
