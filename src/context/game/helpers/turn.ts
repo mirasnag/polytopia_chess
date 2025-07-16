@@ -41,10 +41,11 @@ export function advanceTurn(turn: Turn): Turn {
 export function registerUnitAction(
   turn: Turn,
   unitId: UnitId,
-  key: UnitActionKey
+  actionKey: UnitActionKey
 ): Turn {
-  const cost = 1;
-  const unitActions = new Set(turn.actionsByUnit[unitId] ?? []).add(key);
+  const unitActions = new Set(turn.actionsByUnit[unitId] ?? []);
+  const cost = unitActions.size === 0 ? 1 : 0;
+  unitActions.add(actionKey);
 
   return {
     ...turn,
