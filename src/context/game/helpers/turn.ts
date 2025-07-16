@@ -1,6 +1,3 @@
-// data
-import { UNIT_ACTIONS } from "@/data/unitActions";
-
 // types
 import type { Players, Turn } from "@/types/game";
 import type { PlayerId, UnitId } from "@/types/id";
@@ -46,8 +43,7 @@ export function registerUnitAction(
   unitId: UnitId,
   key: UnitActionKey
 ): Turn {
-  const cost = UNIT_ACTIONS[key].cost;
-
+  const cost = 1;
   const unitActions = new Set(turn.actionsByUnit[unitId] ?? []).add(key);
 
   return {

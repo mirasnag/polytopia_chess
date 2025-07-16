@@ -1,6 +1,6 @@
 // utils
 import { createBrandedId } from "@/utils/common.util";
-import { getUnitBaseStats, getUnitSkills } from "@/data/unitBaseStats";
+import { getUnitBaseStats, getUnitTraits } from "@/data/unitBaseStats";
 
 // types
 import type { Turn, Unit, Units } from "@/types/game";
@@ -92,12 +92,12 @@ export function moveUnit(
   to: { x: number; y: number },
   turn: Turn
 ): Units {
-  const skills = getUnitSkills(units[movingUnitId].type);
+  const traits = getUnitTraits(units[movingUnitId].type);
   const hasAttacked = turn.actionsByUnit[movingUnitId]?.has("attack") ?? false;
 
   const movingUnit = {
     ...units[movingUnitId],
-    canAttack: !hasAttacked && skills.includes("dash"),
+    canAttack: !hasAttacked && traits.includes("dash"),
     canMove: false,
     position: to,
   };
@@ -120,15 +120,15 @@ export function attackUnit(
 
   const isKilled = defendingUnit.stats.hp <= damage;
 
-  const skills = getUnitSkills(attackingUnit.type);
+  const traits = getUnitTraits(attackingUnit.type);
 
   const updatedUnits: Units = {
     ...units,
     [attackingUnitId]: {
       ...attackingUnit,
       position: isKilled ? defendingUnit.position : attackingUnit.position,
-      canAttack: isKilled && skills.includes("persistant"),
-      canMove: skills.includes("escape"),
+      canAttack: isKilled && traits.includes("persist"),
+      canMove: traits.includes("escape"),
     },
   };
 

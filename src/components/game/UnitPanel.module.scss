@@ -13,7 +13,7 @@
     height: 50%;
 
     display: grid;
-    grid-template-areas: "type type" "model skills" "stats stats";
+    grid-template-areas: "type type" "model traits" "stats stats";
     grid-template-columns: 1fr 1fr;
     grid-template-rows: auto 1fr auto;
 
@@ -42,8 +42,8 @@
       justify-content: center;
     }
 
-    .skillList {
-      grid-area: skills;
+    .traitList {
+      grid-area: traits;
 
       display: flex;
       flex-direction: column;
@@ -51,7 +51,7 @@
 
       gap: 1rem;
 
-      .skill {
+      .trait {
         display: flex;
         position: relative;
 
@@ -65,7 +65,7 @@
           background-color: red;
         }
 
-        .skillTooltip {
+        .traitTooltip {
           position: absolute;
           visibility: hidden;
 
@@ -80,7 +80,7 @@
         }
 
         &:hover {
-          .skillTooltip {
+          .traitTooltip {
             visibility: visible;
           }
         }

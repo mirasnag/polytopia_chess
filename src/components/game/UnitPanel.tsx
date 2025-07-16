@@ -2,14 +2,14 @@
 import UnitModel from "../unit/UnitModel";
 
 // data
-import { getUnitBaseStats, getUnitSkills } from "@/data/unitBaseStats";
-import { UNIT_ACTIONS } from "@/data/unitActions";
+import { getUnitBaseStats, getUnitTraits } from "@/data/unitBaseStats";
 
 // types
 import type { Unit } from "@/types/game";
 
 // styles
 import classes from "./UnitPanel.module.scss";
+import { UNIT_TRAITS } from "@/data/unitTraits";
 
 interface Props {
   unit: Unit;
@@ -18,8 +18,8 @@ interface Props {
 const UnitPanel: React.FC<Props> = ({ unit }) => {
   const unitType = unit.type;
   const { hp, movement, range, attack, defense } = getUnitBaseStats(unitType);
-  const skillKeys = getUnitSkills(unitType);
-  const skills = skillKeys.map((skillKey) => UNIT_ACTIONS[skillKey]);
+  const traitKeys = getUnitTraits(unitType);
+  const traits = traitKeys.map((traitKey) => UNIT_TRAITS[traitKey]);
 
   return (
     <div className={classes.layout}>
@@ -32,11 +32,11 @@ const UnitPanel: React.FC<Props> = ({ unit }) => {
           <UnitModel unitType={unitType} />
         </div>
 
-        <div className={classes.skillList}>
-          {skills.map((skill, index) => (
-            <div key={index} className={classes.skill}>
-              <span>{skillKeys[index]}</span>
-              <div className={classes.skillTooltip}>{skill.description}</div>
+        <div className={classes.traitList}>
+          {traits.map((trait, index) => (
+            <div key={index} className={classes.trait}>
+              <span>{traitKeys[index]}</span>
+              <div className={classes.traitTooltip}>{trait.description}</div>
             </div>
           ))}
         </div>

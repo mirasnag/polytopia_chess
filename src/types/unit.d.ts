@@ -8,27 +8,15 @@ export type UnitType =
   | "defender"
   | "mindBender";
 
-export type SkillActionKey =
-  | "dash"
-  | "escape"
-  | "persistant"
-  | "charge"
-  | "heal"
-  | "multiAttack"
-  | "longShot";
+export type UnitTraitKey = "dash" | "escape" | "persist";
+
+export interface UnitTrait {
+  description: string;
+}
 
 export type MoveActionKey = "move";
 export type AttackActionKey = "attack";
-
-export type BasicActionKey = MoveActionKey | AttackActionKey;
-
-export type UnitActionKey = SkillActionKey | BasicActionKey;
-
-export interface UnitAction {
-  description: string;
-  type: "passive" | "active" | "basic";
-  cost: number;
-}
+export type UnitActionKey = MoveActionKey | AttackActionKey;
 
 export interface UnitStats {
   hp: number;
@@ -36,5 +24,5 @@ export interface UnitStats {
   defense: number;
   movement: number;
   range: number;
-  skills?: SkillActionKey[];
+  traits?: UnitTraitKey[];
 }

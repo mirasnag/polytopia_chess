@@ -13,13 +13,6 @@ type ActionPayloadMap = {
     attackingUnitId: UnitId;
     defendingUnitId: UnitId;
   };
-  dash: {};
-  escape: {};
-  persistant: {};
-  charge: {};
-  heal: {};
-  multiAttack: [];
-  longShot: {};
 };
 
 export type PayloadFor<K extends UnitActionKey> = ActionPayloadMap[K];

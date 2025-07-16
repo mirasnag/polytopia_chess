@@ -9,7 +9,7 @@ const UNIT_BASE_STATS: Record<UnitType, UnitStats> = {
     defense: 2,
     movement: 1,
     range: 1,
-    skills: ["dash", "charge"],
+    traits: ["dash"],
   },
   archer: {
     hp: 10,
@@ -17,7 +17,7 @@ const UNIT_BASE_STATS: Record<UnitType, UnitStats> = {
     defense: 1,
     movement: 1,
     range: 2,
-    skills: ["dash", "multiAttack"],
+    traits: ["dash"],
   },
   rider: {
     hp: 10,
@@ -25,7 +25,7 @@ const UNIT_BASE_STATS: Record<UnitType, UnitStats> = {
     defense: 1,
     movement: 2,
     range: 1,
-    skills: ["dash", "escape"],
+    traits: ["dash", "escape"],
   },
   catapult: {
     hp: 10,
@@ -33,7 +33,6 @@ const UNIT_BASE_STATS: Record<UnitType, UnitStats> = {
     defense: 0,
     movement: 1,
     range: 3,
-    skills: ["longShot"],
   },
   knight: {
     hp: 10,
@@ -41,7 +40,7 @@ const UNIT_BASE_STATS: Record<UnitType, UnitStats> = {
     defense: 1,
     movement: 3,
     range: 1,
-    skills: ["dash", "persistant"],
+    traits: ["dash", "persist"],
   },
   mindBender: {
     hp: 10,
@@ -49,7 +48,6 @@ const UNIT_BASE_STATS: Record<UnitType, UnitStats> = {
     defense: 0,
     movement: 1,
     range: 1,
-    skills: ["heal"],
   },
   swordsman: { hp: 15, attack: 3, defense: 3, movement: 1, range: 1 },
   defender: { hp: 15, attack: 1, defense: 3, movement: 1, range: 1 },
@@ -60,5 +58,5 @@ export const getAllUnitBaseStats = () => UNIT_BASE_STATS;
 export const getUnitBaseStats = (unitType: UnitType) =>
   UNIT_BASE_STATS[unitType];
 
-export const getUnitSkills = (unitType: UnitType) =>
-  UNIT_BASE_STATS[unitType].skills ?? [];
+export const getUnitTraits = (unitType: UnitType) =>
+  UNIT_BASE_STATS[unitType].traits ?? [];
