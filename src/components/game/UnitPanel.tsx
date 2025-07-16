@@ -1,8 +1,15 @@
-import type { Unit } from "@/types/game";
-import classes from "./UnitPanel.module.scss";
+// components
 import UnitModel from "../unit/UnitModel";
+
+// data
 import { getUnitBaseStats, getUnitSkills } from "@/data/unitBaseStats";
 import { UNIT_ACTIONS } from "@/data/unitActions";
+
+// types
+import type { Unit } from "@/types/game";
+
+// styles
+import classes from "./UnitPanel.module.scss";
 
 interface Props {
   unit: Unit;
@@ -24,6 +31,7 @@ const UnitPanel: React.FC<Props> = ({ unit }) => {
         <div className={classes.unitModel}>
           <UnitModel unitType={unitType} />
         </div>
+
         <div className={classes.skillList}>
           {skills.map((skill, index) => (
             <div key={index} className={classes.skill}>
@@ -32,6 +40,7 @@ const UnitPanel: React.FC<Props> = ({ unit }) => {
             </div>
           ))}
         </div>
+
         <div className={classes.statList}>
           <h3 className={classes.statLine}>
             <span>Health:</span>
