@@ -119,6 +119,7 @@ export function attackUnit(
   const damage = calculateDamage(attackingUnit, defendingUnit);
 
   const isKilled = defendingUnit.stats.hp <= damage;
+  const isMeleeRangedUnit = attackingUnit.stats.range === 1;
 
   const traits = getUnitTraits(attackingUnit.type);
 
@@ -126,7 +127,10 @@ export function attackUnit(
     ...units,
     [attackingUnitId]: {
       ...attackingUnit,
-      position: isKilled ? defendingUnit.position : attackingUnit.position,
+      position:
+        isKilled && isMeleeRangedUnit
+          ? defendingUnit.position
+          : attackingUnit.position,
       canAttack: isKilled && traits.includes("persist"),
       canMove: traits.includes("escape"),
     },
