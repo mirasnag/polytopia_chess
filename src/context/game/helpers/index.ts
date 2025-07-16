@@ -49,7 +49,7 @@ export function moveReducer(
   const unit = state.units[unitId];
   const { x: oldX, y: oldY } = unit.position;
 
-  const updatedUnits = moveUnit(state.units, unitId, { x, y });
+  const updatedUnits = moveUnit(state.units, unitId, { x, y }, state.turn);
 
   const updatedTiles = moveTileOccupant(
     state.map.tiles,

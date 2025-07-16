@@ -3,7 +3,7 @@ import { createBrandedId } from "@/utils/common.util";
 import { getUnitBaseStats, getUnitSkills } from "@/data/unitBaseStats";
 
 // types
-import type { Unit, Units } from "@/types/game";
+import type { Turn, Unit, Units } from "@/types/game";
 import type { PlayerId, UnitId } from "@/types/id";
 import type { UnitType } from "@/types/unit";
 import { calculateDamage } from "@/utils/combat.util";
@@ -89,13 +89,15 @@ export function resetAllUnitState(units: Units): Units {
 export function moveUnit(
   units: Units,
   movingUnitId: UnitId,
-  to: { x: number; y: number }
+  to: { x: number; y: number },
+  turn: Turn
 ): Units {
   const skills = getUnitSkills(units[movingUnitId].type);
+  const hasAttacked = turn.actionsByUnit[movingUnitId].has("attack");
 
   const movingUnit = {
     ...units[movingUnitId],
-    canAttack: skills.includes("dash"),
+    canAttack: !hasAttacked && skills.includes("dash"),
     canMove: false,
     position: to,
   };
@@ -124,7 +126,7 @@ export function attackUnit(
     ...units,
     [attackingUnitId]: {
       ...attackingUnit,
-      canAttack: skills.includes("persistant"),
+      canAttack: isKilled && skills.includes("persistant"),
       canMove: skills.includes("escape"),
     },
   };
