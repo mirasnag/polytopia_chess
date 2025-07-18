@@ -12,7 +12,7 @@ import GameOutcomeModal from "@/components/game/GameOutcomeModal";
 import UnitPanel from "@/components/game/UnitPanel";
 
 // utils
-import { botChooseActions } from "@/utils/bots.util";
+import { botChooseActions } from "@/engine/bots";
 
 // types
 import type { Tile } from "@/types/tile";

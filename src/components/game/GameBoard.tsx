@@ -6,7 +6,7 @@ import { useGame } from "@/context/game/GameContext";
 import BoardTile from "./BoardTile";
 
 // utils
-import { getValidAttacks, getValidMoves } from "@/utils/action.util";
+import { getValidAttacks, getValidMoves } from "@/engine/actions";
 
 // types
 import type { Tile } from "@/types/tile";

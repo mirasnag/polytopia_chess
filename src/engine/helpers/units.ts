@@ -6,7 +6,7 @@ import { getUnitBaseStats, getUnitTraits } from "@/data/unitBaseStats";
 import type { Turn, Unit, Units } from "@/types/game";
 import type { PlayerId, UnitId } from "@/types/id";
 import type { UnitType } from "@/types/unit";
-import { calculateDamage } from "@/utils/combat.util";
+import { calculateDamage } from "@/engine/combat";
 
 const edgeRowUnits: UnitType[] = [
   "catapult",

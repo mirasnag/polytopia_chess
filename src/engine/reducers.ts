@@ -5,7 +5,7 @@ import {
   createReducer,
   moveReducer,
   resignReducer,
-} from "./helpers";
+} from "@/engine/core";
 
 // types
 import type { GameState } from "@/types/game";

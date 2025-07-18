@@ -7,8 +7,8 @@ import type { GameState, PlayerInGame } from "@/types/game";
 import type { GameAction } from "@/types/action";
 
 // helpers
-import { gameReducer } from "./gameReducer";
-import { createReducer } from "./helpers";
+import { createReducer } from "@/engine/core";
+import { gameReducer } from "@/engine/reducers";
 import { gameManager } from "@/managers/gameManager";
 
 export const GameContext = createContext<{
