@@ -7,6 +7,7 @@ import {
   type UnitSkillKey,
   type UnitStats,
 } from "@/types/unit";
+import type { GameConfig } from "./gameConfig";
 
 export type BotType = "easy-bot";
 export type PlayerType = "human" | BotType;
@@ -59,4 +60,5 @@ export interface GameState {
   map: MapGrid;
   turn: Turn;
   outcome: GameOutcome;
+  config: GameConfig;
 }

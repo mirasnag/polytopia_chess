@@ -9,7 +9,7 @@ import Modal from "../utils/Modal";
 import classes from "./GameOutcomeModal.module.scss";
 
 const GameOutcomeModal = () => {
-  const { players, outcome, dispatch } = useGame();
+  const { players, outcome, config, dispatch } = useGame();
   const navigate = useNavigate();
 
   const winner =
@@ -22,7 +22,7 @@ const GameOutcomeModal = () => {
   const handleNewGameClick = () => {
     dispatch({
       type: "create",
-      payload: {},
+      payload: { config: config },
     });
   };
 

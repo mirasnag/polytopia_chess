@@ -53,6 +53,7 @@ export function createReducer(
     map: map,
     turn: updatedTurn,
     outcome: { status: "ongoing" },
+    config: config,
   };
 }
 

@@ -18,6 +18,7 @@ export const GameContext = createContext<{
   turn: GameState["turn"];
   players: GameState["players"];
   outcome: GameState["outcome"];
+  config: GameState["config"];
   currentPlayer: PlayerInGame;
   dispatch: Dispatch<GameAction>;
 } | null>(null);
@@ -49,6 +50,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     turn: state.turn,
     outcome: state.outcome,
     players: state.players,
+    config: state.config,
     currentPlayer: state.players[state.turn.playerOrder[state.turn.orderIndex]],
   };
 

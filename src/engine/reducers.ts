@@ -14,7 +14,8 @@ import type { GameAction } from "@/types/action";
 export function gameReducer(state: GameState, action: GameAction): GameState {
   switch (action.type) {
     case "create":
-      return createReducer();
+      const { config } = action.payload;
+      return createReducer(config);
     case "resign":
       return resignReducer(state);
     case "advance":
