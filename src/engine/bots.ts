@@ -1,6 +1,7 @@
 import type { UnitAction } from "@/types/action";
 import type { BotType, GameState } from "@/types/game";
 import { getAllValidUnitActions } from "@/engine/helpers/actions";
+import { gameEngine } from "./core";
 
 export const botChooseActions = (
   state: GameState,
@@ -15,8 +16,23 @@ export const botChooseActions = (
 };
 
 export const easyBotChooseActions = (state: GameState): UnitAction[] => {
-  const validActions = getAllValidUnitActions(state);
-  const randomActionIndex = Math.round(Math.random() * validActions.length);
+  const botActions: UnitAction[] = [];
 
-  return [validActions[randomActionIndex]];
+  let currentState: GameState = state;
+  const maxNumberOfActions = 5;
+
+  while (botActions.length < maxNumberOfActions) {
+    const validActions = getAllValidUnitActions(currentState);
+
+    if (validActions.length === 0) break;
+
+    const randomActionIndex = Math.round(Math.random() * validActions.length);
+    const currentAction = validActions[randomActionIndex];
+
+    botActions.push(currentAction);
+
+    currentState = gameEngine(currentState, currentAction);
+  }
+
+  return botActions;
 };
