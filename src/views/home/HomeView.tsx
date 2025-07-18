@@ -12,7 +12,7 @@ const HomeView = () => {
 
   const handleNewGameClick = () => {
     gameManager.clear();
-    navigate("game");
+    navigate("game/creation");
   };
 
   const handleResumeGameClick = () => {
