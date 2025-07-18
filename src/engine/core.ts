@@ -1,151 +1,33 @@
 // helpers
 import {
-  applyUnitsToMap,
-  copyTiles,
-  createMap,
-  moveTileOccupant,
-  removeTileOccupant,
-  replaceTileOccupant,
-} from "@/engine/helpers/map";
-import {
-  createUnits,
-  attackUnit,
-  moveUnit,
-  resetAllUnitState,
-} from "@/engine/helpers/units";
-import {
-  advanceTurn,
-  getInitialTurn,
-  registerUnitAction,
-} from "@/engine/helpers/turn";
-import { kingCaptureOutcome, resignOutcome } from "@/engine/helpers/outcome";
-import { isKing, schemaVersion } from "@/engine/common";
-
-// utils
-import { createBrandedId } from "@/utils/common.util";
+  advanceReducer,
+  attackReducer,
+  createReducer,
+  moveReducer,
+  resignReducer,
+} from "@/engine/reducers/index";
 
 // types
-import type { GameState, Players } from "@/types/game";
-import type { UnitId } from "@/types/id";
-import type { GameConfig } from "@/types/gameConfig";
-import { defaultGameConfig } from "@/data/defaultGameConfig";
+import type { GameState } from "@/types/game";
+import type { GameAction } from "@/types/action";
 
-export function createReducer(
-  config: GameConfig = defaultGameConfig
-): GameState {
-  const { playerTypes } = config;
-  const playerA = createBrandedId("player");
-  const playerB = createBrandedId("player");
+export const gameEngine = (state: GameState, action: GameAction): GameState => {
+  switch (action.type) {
+    case "create":
+      const { config } = action.payload;
+      return createReducer(config);
+    case "resign":
+      return resignReducer(state);
+    case "advance":
+      return advanceReducer(state);
+    case "move":
+      const { unitId, to } = action.payload;
+      return moveReducer(state, unitId, to);
+    case "attack":
+      const { attackingUnitId, defendingUnitId } = action.payload;
+      return attackReducer(state, attackingUnitId, defendingUnitId);
 
-  const units = createUnits(playerA, playerB);
-  const map = applyUnitsToMap(createMap(), units);
-
-  const players: Players = {
-    [playerA]: { id: playerA, name: "A", type: playerTypes[0] },
-    [playerB]: { id: playerB, name: "B", type: playerTypes[1] },
-  };
-  const updatedTurn = getInitialTurn(players);
-
-  return {
-    schemaVersion: schemaVersion,
-    players: players,
-    units: units,
-    map: map,
-    turn: updatedTurn,
-    outcome: { status: "ongoing" },
-    config: config,
-  };
-}
-
-export function moveReducer(
-  state: GameState,
-  unitId: UnitId,
-  newPos: { x: number; y: number }
-): GameState {
-  const unit = state.units[unitId];
-  const oldPos = unit.position;
-
-  const updatedUnits = moveUnit(state.units, unitId, newPos, state.turn);
-
-  const updatedTiles = moveTileOccupant(state.map.tiles, oldPos, newPos);
-
-  const updatedTurn = registerUnitAction(state.turn, unitId, "move");
-
-  return {
-    ...state,
-    units: updatedUnits,
-    map: {
-      ...state.map,
-      tiles: updatedTiles,
-    },
-    turn: updatedTurn,
-  };
-}
-
-export function attackReducer(
-  state: GameState,
-  attackingUnitId: UnitId,
-  defendingUnitId: UnitId
-): GameState {
-  const attackingUnit = state.units[attackingUnitId];
-  const defendingUnit = state.units[defendingUnitId];
-  const tiles = state.map.tiles;
-
-  const updatedUnits = attackUnit(
-    state.units,
-    attackingUnitId,
-    defendingUnitId
-  );
-
-  const isKilled = updatedUnits[defendingUnitId] === undefined;
-  const isMeleeRangedUnit = attackingUnit.stats.range === 1;
-
-  const updatedTiles = isKilled
-    ? isMeleeRangedUnit
-      ? replaceTileOccupant(
-          tiles,
-          attackingUnit.position,
-          defendingUnit.position
-        )
-      : removeTileOccupant(tiles, defendingUnit.position)
-    : copyTiles(tiles);
-
-  const isKingKilled = isKing(defendingUnit) && isKilled;
-  const updatedOutcome = isKingKilled
-    ? kingCaptureOutcome(attackingUnit.ownerId)
-    : { ...state.outcome };
-
-  const updatedTurn = registerUnitAction(state.turn, attackingUnitId, "attack");
-
-  return {
-    ...state,
-    units: updatedUnits,
-    map: {
-      ...state.map,
-      tiles: updatedTiles,
-    },
-    turn: updatedTurn,
-    outcome: updatedOutcome,
-  };
-}
-
-export function resignReducer(state: GameState): GameState {
-  const currentPlayerId = state.turn.playerOrder[state.turn.orderIndex];
-  const updatedOutcome = resignOutcome(state.players, currentPlayerId);
-
-  return {
-    ...state,
-    outcome: updatedOutcome,
-  };
-}
-
-export function advanceReducer(state: GameState): GameState {
-  const updatedTurn = advanceTurn(state.turn);
-  const updatedUnits = resetAllUnitState(state.units);
-
-  return {
-    ...state,
-    turn: updatedTurn,
-    units: updatedUnits,
-  };
-}
+    default:
+      return state;
+  }
+};

@@ -7,8 +7,8 @@ import type { GameState, PlayerInGame } from "@/types/game";
 import type { GameAction } from "@/types/action";
 
 // helpers
-import { createReducer } from "@/engine/core";
-import { gameReducer } from "@/engine/reducers";
+import { createReducer } from "@/engine/reducers/index";
+import { gameEngine } from "@/engine/core";
 import { gameManager } from "@/managers/gameManager";
 
 export const GameContext = createContext<{
@@ -36,7 +36,7 @@ const initGameState = (): GameState => {
 };
 
 export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
-  const [state, dispatch] = useReducer(gameReducer, undefined, initGameState);
+  const [state, dispatch] = useReducer(gameEngine, undefined, initGameState);
 
   useEffect(() => {
     gameManager.save(state);
