@@ -1,7 +1,7 @@
 // types
 import type { Players, Turn } from "@/types/game";
 import type { PlayerId, UnitId } from "@/types/id";
-import type { UnitActionKey } from "@/types/unit";
+import type { UnitActionKey } from "@/types/action";
 
 // utils
 import { shuffleArray } from "@/utils/common.util";

@@ -6,19 +6,10 @@ import {
   moveReducer,
   resignReducer,
 } from "./helpers";
-import type { PayloadFor } from "./helpers/actionPayload";
 
 // types
 import type { GameState } from "@/types/game";
-import type { UnitActionKey } from "@/types/unit";
-
-export type GameAction =
-  | { type: "Create" }
-  | { type: "Resign" }
-  | { type: "Advance" }
-  | {
-      [K in UnitActionKey]: { type: K; payload: PayloadFor<K> };
-    }[UnitActionKey];
+import type { GameAction } from "@/types/action";
 
 export function gameReducer(state: GameState, action: GameAction): GameState {
   switch (action.type) {

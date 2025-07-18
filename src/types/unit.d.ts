@@ -14,10 +14,6 @@ export interface UnitTrait {
   description: string;
 }
 
-export type MoveActionKey = "move";
-export type AttackActionKey = "attack";
-export type UnitActionKey = MoveActionKey | AttackActionKey;
-
 export interface UnitStats {
   hp: number;
   attack: number;
