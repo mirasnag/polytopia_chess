@@ -20,3 +20,9 @@ export function shuffleArray(array: any[]) {
 
   return array;
 }
+
+export function getRandomArrayEntry<T extends any>(array: T[]): T {
+  const randomIndex = Math.floor(Math.random() * array.length);
+
+  return array[randomIndex];
+}

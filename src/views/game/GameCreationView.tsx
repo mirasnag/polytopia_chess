@@ -26,7 +26,10 @@ const GameCreationView: React.FC<Props> = () => {
     <div className={styles.layout}>
       <div className={styles.buttons}>
         <button onClick={() => handleButtonClick("easy-bot")}>
-          Play vs Bot
+          Play vs Easy Bot
+        </button>
+        <button onClick={() => handleButtonClick("normal-bot")}>
+          Play vs Normal Bot
         </button>
         <button onClick={() => handleButtonClick("human")}>
           Play vs Human

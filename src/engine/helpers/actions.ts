@@ -45,12 +45,11 @@ export function getValidUnitActions(
 }
 
 export function getAllValidUnitActions(state: GameState): UnitAction[] {
+  if (state.outcome.status === "finished") return [];
+
   const validActions: UnitAction[] = [];
   const { turn, units } = state;
   const currentPlayerId = turn.playerOrder[turn.orderIndex];
-
-  if (turn.actionPointsRemaining === 0) return validActions;
-  if (state.outcome.status === "finished") return validActions;
 
   Object.values(units).forEach((unit) => {
     if (unit.ownerId === currentPlayerId) {
