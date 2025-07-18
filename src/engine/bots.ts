@@ -1,6 +1,6 @@
 import type { UnitAction } from "@/types/action";
 import type { BotType, GameState } from "@/types/game";
-import { getAllValidUnitActions } from "@/engine/actions";
+import { getAllValidUnitActions } from "@/engine/helpers/actions";
 
 export const botChooseActions = (
   state: GameState,
