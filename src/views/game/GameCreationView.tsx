@@ -1,13 +1,36 @@
+import { useGame } from "@/context/game/GameContext";
 import styles from "./GameCreationView.module.scss";
+import type { PlayerType } from "@/types/game";
+import { useNavigate } from "react-router-dom";
 
 interface Props {}
 
 const GameCreationView: React.FC<Props> = () => {
+  const { dispatch } = useGame();
+  const navigate = useNavigate();
+
+  const handleButtonClick = (opponentType: PlayerType) => {
+    dispatch({
+      type: "create",
+      payload: {
+        config: {
+          playerTypes: ["human", opponentType],
+        },
+      },
+    });
+
+    navigate("/game");
+  };
+
   return (
     <div className={styles.layout}>
       <div className={styles.buttons}>
-        <button>Play vs Bot</button>
-        <button>Play vs Human</button>
+        <button onClick={() => handleButtonClick("easy-bot")}>
+          Play vs Bot
+        </button>
+        <button onClick={() => handleButtonClick("human")}>
+          Play vs Human
+        </button>
       </div>
     </div>
   );

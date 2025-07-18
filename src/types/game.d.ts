@@ -8,7 +8,8 @@ import {
   type UnitStats,
 } from "@/types/unit";
 
-export type PlayerType = "human" | "easy-bot";
+export type BotType = "easy-bot";
+export type PlayerType = "human" | BotType;
 
 export interface PlayerInGame {
   id: PlayerId;

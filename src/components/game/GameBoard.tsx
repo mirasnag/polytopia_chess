@@ -22,6 +22,7 @@ interface Props {
 const GameBoard: React.FC<Props> = ({ activeTile, setActiveTile }) => {
   const { state, currentPlayer, tiles, units, dispatch } = useGame();
 
+  const isBot = currentPlayer.type !== "human";
   const activeUnitId = activeTile?.occupantId;
 
   const activeUnit = useMemo(() => {
@@ -41,6 +42,8 @@ const GameBoard: React.FC<Props> = ({ activeTile, setActiveTile }) => {
   );
 
   const handleTileClick = (tile: Tile) => {
+    if (isBot) return;
+
     if (!activeUnit) {
       setActiveTile(tile);
       return;

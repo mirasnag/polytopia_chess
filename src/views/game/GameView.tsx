@@ -1,6 +1,7 @@
 // hooks
 import { useEffect, useMemo, useState } from "react";
 import { useGame } from "@/context/game/GameContext";
+import { useLogGameState } from "@/utils/logging.util";
 
 // components
 import GameBoard from "@/components/game/GameBoard";
@@ -10,15 +11,20 @@ import MenuButtons from "@/components/game/MenuButtons";
 import GameOutcomeModal from "@/components/game/GameOutcomeModal";
 import UnitPanel from "@/components/game/UnitPanel";
 
+// utils
+import { botChooseActions } from "@/utils/bots.util";
+
 // types
 import type { Tile } from "@/types/tile";
 
 // styles
 import classes from "./GameView.module.scss";
+import type { UnitAction } from "@/types/action";
 
 const GameView = () => {
-  const { state, units, currentPlayer, outcome } = useGame();
+  const { state, units, currentPlayer, outcome, dispatch } = useGame();
   const [activeTile, setActiveTile] = useState<Tile | null>(null);
+  useLogGameState(state);
 
   const activeUnitId = activeTile?.occupantId;
 
@@ -29,16 +35,38 @@ const GameView = () => {
   }, [activeTile, units, currentPlayer]);
 
   useEffect(() => {
-    const logGameState = () => {
-      console.log("Game state:", state);
+    if (currentPlayer.type === "human" || outcome.status === "finished") return;
+
+    let cancelled = false;
+
+    const runBotAction = async (action: UnitAction) => {
+      if (cancelled) return;
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      dispatch(action);
     };
 
-    (window as any).gs = logGameState;
+    const runBotTurn = async () => {
+      if (currentPlayer.type === "human") return;
+
+      const botActions = botChooseActions(state, currentPlayer.type);
+
+      for (let i = 0; i < botActions.length; i++) {
+        await runBotAction(botActions[i]);
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      if (!cancelled) {
+        dispatch({ type: "advance", payload: {} });
+      }
+    };
+
+    runBotTurn();
 
     return () => {
-      delete (window as any).gs;
+      cancelled = true;
     };
-  }, []);
+  }, [currentPlayer]);
 
   return (
     <div className={classes.layout}>
