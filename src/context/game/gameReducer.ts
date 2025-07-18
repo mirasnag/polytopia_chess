@@ -13,11 +13,11 @@ import type { GameAction } from "@/types/action";
 
 export function gameReducer(state: GameState, action: GameAction): GameState {
   switch (action.type) {
-    case "Create":
+    case "create":
       return createReducer();
-    case "Resign":
+    case "resign":
       return resignReducer(state);
-    case "Advance":
+    case "advance":
       return advanceReducer(state);
     case "move":
       const { unitId, to } = action.payload;

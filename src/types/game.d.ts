@@ -8,9 +8,12 @@ import {
   type UnitStats,
 } from "@/types/unit";
 
+export type PlayerType = "human" | "easy-bot";
+
 export interface PlayerInGame {
   id: PlayerId;
   name: string;
+  type: PlayerType;
 }
 
 export type Players = Record<PlayerId, PlayerInGame>;

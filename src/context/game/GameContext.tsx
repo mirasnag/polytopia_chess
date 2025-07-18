@@ -4,9 +4,10 @@ import { createContext, useContext, useEffect, useReducer } from "react";
 // types
 import type { Dispatch, ReactNode } from "react";
 import type { GameState, PlayerInGame } from "@/types/game";
+import type { GameAction } from "@/types/action";
 
 // helpers
-import { gameReducer, type GameAction } from "./gameReducer";
+import { gameReducer } from "./gameReducer";
 import { createReducer } from "./helpers";
 import { gameManager } from "@/managers/gameManager";
 

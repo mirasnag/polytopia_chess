@@ -21,7 +21,8 @@ const GameOutcomeModal = () => {
 
   const handleNewGameClick = () => {
     dispatch({
-      type: "Create",
+      type: "create",
+      payload: {},
     });
   };
 

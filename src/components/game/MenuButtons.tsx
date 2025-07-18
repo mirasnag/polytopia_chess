@@ -9,13 +9,15 @@ const MenuButtons = () => {
 
   const handleResignButtonClick = () => {
     dispatch({
-      type: "Resign",
+      type: "resign",
+      payload: {},
     });
   };
 
   const handleDoneButtonClick = () => {
     dispatch({
-      type: "Advance",
+      type: "advance",
+      payload: {},
     });
   };
 

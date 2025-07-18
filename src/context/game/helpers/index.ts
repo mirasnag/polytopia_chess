@@ -16,18 +16,24 @@ import { isKing, schemaVersion } from "./common";
 import { createBrandedId } from "@/utils/common.util";
 
 // types
-import type { GameState } from "@/types/game";
+import type { GameState, Players } from "@/types/game";
 import type { UnitId } from "@/types/id";
+import type { GameConfig } from "@/types/gameConfig";
+import { defaultGameConfig } from "@/data/defaultGameConfig";
 
-export function createReducer(): GameState {
+export function createReducer(
+  config: GameConfig = defaultGameConfig
+): GameState {
+  const { playerTypes } = config;
   const playerA = createBrandedId("player");
   const playerB = createBrandedId("player");
 
   const units = createUnits(playerA, playerB);
   const map = applyUnitsToMap(createMap(), units);
-  const players = {
-    [playerA]: { id: playerA, name: "A" },
-    [playerB]: { id: playerB, name: "B" },
+
+  const players: Players = {
+    [playerA]: { id: playerA, name: "A", type: playerTypes[0] },
+    [playerB]: { id: playerB, name: "B", type: playerTypes[1] },
   };
   const updatedTurn = getInitialTurn(players);
 
