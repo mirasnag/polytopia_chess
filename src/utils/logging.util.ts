@@ -17,6 +17,34 @@ export function prettyLogUnits(state: GameState): void {
   console.groupEnd();
 }
 
+const EMPTY_CELL = "·";
+
+export function prettyLogBoard(state: GameState): void {
+  const { map, units } = state;
+  const { width, height } = map;
+
+  // 1. Initialize an empty board
+  const board: string[][] = Array.from({ length: height }, () =>
+    Array.from({ length: width }, () => EMPTY_CELL)
+  );
+
+  // 2. Fill in unit symbols (first letter of type, uppercase)
+  Object.values(units).forEach((u) => {
+    const { x, y } = u.position;
+    const symbol = u.type.charAt(0).toUpperCase();
+    board[y][x] = symbol;
+  });
+
+  // 3. Log with row & column headers
+  const header = [" ", ...Array.from({ length: width }, (_, i) => i)].join(" ");
+  console.groupCollapsed("Board State");
+  console.log(header);
+  board.forEach((row, rowIndex) => {
+    console.log([rowIndex, ...row].join(" "));
+  });
+  console.groupEnd();
+}
+
 export function useLogGameState(state: GameState) {
   useEffect(() => {
     const logGameState = () => {
