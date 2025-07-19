@@ -130,7 +130,7 @@ export function attackReducer(
 }
 
 export function resignReducer(state: GameState): GameState {
-  const currentPlayerId = state.turn.playerOrder[state.turn.orderIndex];
+  const { currentPlayerId } = state.turn;
   const updatedOutcome = resignOutcome(state.players, currentPlayerId);
 
   return {

@@ -2,18 +2,11 @@ import { useGame } from "@/context/game/GameContext";
 import classes from "./HUD.module.scss";
 
 const HUD = () => {
-  const { players, turn } = useGame();
+  const { turn, currentPlayer } = useGame();
 
-  const {
-    counter,
-    playerOrder,
-    orderIndex,
-    actionPointsRemaining,
-    actionPointsTotal,
-  } = turn;
+  const { counter, actionPointsRemaining, actionPointsTotal } = turn;
 
-  const currentPlayerId = playerOrder[orderIndex];
-  const { name: currentPlayerName } = players[currentPlayerId];
+  const { name: currentPlayerName } = currentPlayer;
 
   return (
     <div className={classes.layout}>

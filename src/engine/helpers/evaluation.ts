@@ -41,7 +41,7 @@ export const getStateEvaluation = (state: GameState): GameStateEvaluation => {
 
 export const getPlayerScore = (
   state: GameState,
-  currentPlayerId: PlayerId
+  playerId: PlayerId
 ): number => {
   const { players } = state;
   const scores = getStateEvaluation(state);
@@ -49,7 +49,7 @@ export const getPlayerScore = (
 
   Object.values(players).forEach((player) => {
     playerScore +=
-      player.id === currentPlayerId ? scores[player.id] : -scores[player.id];
+      player.id === playerId ? scores[player.id] : -scores[player.id];
   });
 
   return playerScore;
@@ -58,7 +58,7 @@ export const getPlayerScore = (
 export const evaluatePlayerAction = (
   state: GameState,
   action: UnitAction,
-  currentPlayerId: PlayerId
+  playerId: PlayerId
 ): number => {
   const { players } = state;
 
@@ -69,7 +69,7 @@ export const evaluatePlayerAction = (
 
   Object.values(players).forEach((player) => {
     actionScore +=
-      player.id === currentPlayerId ? scores[player.id] : -scores[player.id];
+      player.id === playerId ? scores[player.id] : -scores[player.id];
   });
 
   return actionScore;

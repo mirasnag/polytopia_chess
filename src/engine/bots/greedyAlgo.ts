@@ -7,8 +7,7 @@ import { gameEngine } from "../core";
 
 export const greedyBotAlgo = (state: GameState): TurnActions => {
   const botActions: TurnActions = [];
-  const { turn } = state;
-  const currentPlayerId = turn.playerOrder[turn.orderIndex];
+  const { currentPlayerId } = state.turn;
 
   let currentState: GameState = state;
   const maxNumberOfActions = 5;

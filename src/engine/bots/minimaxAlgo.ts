@@ -6,8 +6,7 @@ import type { PlayerId } from "@/types/id";
 import { getRandomArrayEntry } from "@/utils/common.util";
 
 export const minimaxBotAlgo = (state: GameState): TurnActions => {
-  const { orderIndex, playerOrder } = state.turn;
-  const currentPlayerId = playerOrder[orderIndex];
+  const { currentPlayerId } = state.turn;
   const bestActionCandidates = minimax(state, currentPlayerId);
   const randomBestAction = getRandomArrayEntry(bestActionCandidates);
 

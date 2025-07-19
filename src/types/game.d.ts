@@ -36,6 +36,7 @@ export interface Turn {
   counter: number;
   playerOrder: PlayerId[];
   orderIndex: number;
+  currentPlayerId: PlayerId;
 
   actionPointsTotal: number;
   actionPointsRemaining: number;

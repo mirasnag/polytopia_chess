@@ -49,7 +49,7 @@ export function getAllValidUnitActions(state: GameState): UnitAction[] {
 
   const validActions: UnitAction[] = [];
   const { turn, units } = state;
-  const currentPlayerId = turn.playerOrder[turn.orderIndex];
+  const { currentPlayerId } = turn;
 
   Object.values(units).forEach((unit) => {
     if (unit.ownerId === currentPlayerId) {

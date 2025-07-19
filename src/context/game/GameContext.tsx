@@ -51,7 +51,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     outcome: state.outcome,
     players: state.players,
     config: state.config,
-    currentPlayer: state.players[state.turn.playerOrder[state.turn.orderIndex]],
+    currentPlayer: state.players[state.turn.currentPlayerId],
   };
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>;
