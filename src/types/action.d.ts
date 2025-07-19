@@ -4,7 +4,8 @@ export type PlayerActionKey = "create" | "resign" | "advance";
 
 export type MoveActionKey = "move";
 export type AttackActionKey = "attack";
-export type UnitActionKey = MoveActionKey | AttackActionKey;
+export type KillActionKey = "kill";
+export type UnitActionKey = MoveActionKey | AttackActionKey | KillActionKey;
 
 export type ActionKey = PlayerActionKey | UnitActionKey;
 

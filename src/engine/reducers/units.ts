@@ -4,7 +4,7 @@ import { getUnitBaseStats, getUnitTraits } from "@/data/unitBaseStats";
 import { calculateDamage } from "@/engine/helpers/combat";
 
 // types
-import type { Turn, Unit, Units } from "@/types/game";
+import type { Unit, Units } from "@/types/game";
 import type { PlayerId, UnitId } from "@/types/id";
 import type { UnitType } from "@/types/unit";
 
@@ -46,8 +46,6 @@ function placeRowUnits(
       ownerId: owner,
       position: { x: col, y: row },
       stats: getUnitBaseStats(unitType),
-      canAttack: true,
-      canMove: true,
     };
   }
 }
@@ -69,8 +67,6 @@ function resetUnitState(unit: Unit): Unit {
 
   return {
     ...unit,
-    canMove: true,
-    canAttack: true,
     stats: {
       ...baseStats,
       hp: unit.stats.hp,
@@ -89,16 +85,10 @@ export function resetAllUnitState(units: Units): Units {
 export function moveUnit(
   units: Units,
   movingUnitId: UnitId,
-  to: { x: number; y: number },
-  turn: Turn
+  to: { x: number; y: number }
 ): Units {
-  const traits = getUnitTraits(units[movingUnitId].type);
-  const hasAttacked = turn.actionsByUnit[movingUnitId]?.has("attack") ?? false;
-
   const movingUnit = {
     ...units[movingUnitId],
-    canAttack: !hasAttacked && traits.includes("dash"),
-    canMove: false,
     position: to,
   };
 

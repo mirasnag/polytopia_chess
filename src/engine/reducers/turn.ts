@@ -6,8 +6,6 @@ import type { UnitActionKey } from "@/types/action";
 // utils
 import { shuffleArray } from "@/utils/common.util";
 
-const basePoints = 1;
-
 export function getInitialTurn(players: Players): Turn {
   const order = Object.keys(players) as PlayerId[];
   const shuffledOrder = shuffleArray(order);
@@ -17,9 +15,8 @@ export function getInitialTurn(players: Players): Turn {
     playerOrder: shuffledOrder,
     orderIndex: 0,
     currentPlayerId: shuffledOrder[0],
-    actionPointsTotal: basePoints,
-    actionPointsRemaining: basePoints,
-    actionsByUnit: {},
+    actingUnitId: null,
+    actions: [],
   };
 }
 
@@ -34,9 +31,8 @@ export function advanceTurn(turn: Turn): Turn {
     counter: nextCounter,
     orderIndex: nextOrderIndex,
     currentPlayerId: turn.playerOrder[nextOrderIndex],
-    actionPointsTotal: basePoints,
-    actionPointsRemaining: basePoints,
-    actionsByUnit: {},
+    actingUnitId: null,
+    actions: [],
   };
 }
 
@@ -45,16 +41,9 @@ export function registerUnitAction(
   unitId: UnitId,
   actionKey: UnitActionKey
 ): Turn {
-  const unitActions = new Set(turn.actionsByUnit[unitId] ?? []);
-  const cost = unitActions.size === 0 ? 1 : 0;
-  unitActions.add(actionKey);
-
   return {
     ...turn,
-    actionPointsRemaining: turn.actionPointsRemaining - cost,
-    actionsByUnit: {
-      ...turn.actionsByUnit,
-      [unitId]: unitActions,
-    },
+    actions: [...turn.actions, actionKey],
+    actingUnitId: unitId,
   };
 }

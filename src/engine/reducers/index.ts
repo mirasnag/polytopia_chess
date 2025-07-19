@@ -65,7 +65,7 @@ export function moveReducer(
   const unit = state.units[unitId];
   const oldPos = unit.position;
 
-  const updatedUnits = moveUnit(state.units, unitId, newPos, state.turn);
+  const updatedUnits = moveUnit(state.units, unitId, newPos);
 
   const updatedTiles = moveTileOccupant(state.map.tiles, oldPos, newPos);
 
@@ -115,7 +115,11 @@ export function attackReducer(
     ? kingCaptureOutcome(attackingUnit.ownerId)
     : { ...state.outcome };
 
-  const updatedTurn = registerUnitAction(state.turn, attackingUnitId, "attack");
+  const updatedTurn = registerUnitAction(
+    state.turn,
+    attackingUnitId,
+    isKilled ? "kill" : "attack"
+  );
 
   return {
     ...state,

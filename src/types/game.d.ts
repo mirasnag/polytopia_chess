@@ -26,8 +26,6 @@ export interface Unit {
   ownerId: PlayerId;
   position: { x: number; y: number };
   stats: UnitStats;
-  canAttack: boolean;
-  canMove: boolean;
 }
 
 export type Units = Record<UnitId, Unit>;
@@ -38,9 +36,8 @@ export interface Turn {
   orderIndex: number;
   currentPlayerId: PlayerId;
 
-  actionPointsTotal: number;
-  actionPointsRemaining: number;
-  actionsByUnit: Record<UnitId, Set<ActionKey>>;
+  actingUnitId: UnitId | null;
+  actions: ActionKey[];
 }
 
 export type GameOutcome =

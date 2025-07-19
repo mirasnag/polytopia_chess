@@ -4,7 +4,7 @@ import classes from "./HUD.module.scss";
 const HUD = () => {
   const { turn, currentPlayer } = useGame();
 
-  const { counter, actionPointsRemaining, actionPointsTotal } = turn;
+  const { counter } = turn;
 
   const { name: currentPlayerName } = currentPlayer;
 
@@ -17,9 +17,6 @@ const HUD = () => {
       <h3 className={classes.text}>
         Player:
         <span className={classes.highlightText}> {currentPlayerName}</span>
-      </h3>
-      <h3 className={classes.text}>
-        Action Points: {actionPointsRemaining} / {actionPointsTotal}
       </h3>
     </div>
   );

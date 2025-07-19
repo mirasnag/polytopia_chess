@@ -1,19 +1,24 @@
 // data
-import { getUnitBaseStats } from "@/data/unitBaseStats";
+import { getUnitBaseStats, getUnitTraits } from "@/data/unitBaseStats";
 
 // types
 import type { GameState, Turn, Unit } from "@/types/game";
 import type { Tile } from "@/types/tile";
 
 export function canMove(unit: Unit, turn: Turn): boolean {
-  const { actionPointsRemaining, actionsByUnit } = turn;
+  const { actions, actingUnitId } = turn;
 
-  const unitHasActed = actionsByUnit[unit.id] !== undefined;
-  const actionCost = 1;
+  if (actingUnitId && actingUnitId !== unit.id) return false;
 
-  if (actionPointsRemaining < actionCost && !unitHasActed) return false;
+  // by default, unit cannot move after if it acted
+  const hasActed = actions.length > 0;
 
-  return unit.canMove;
+  // unit can escape if the last action is not move (attack or kill)
+  const canEscape =
+    actions[actions.length - 1] !== "move" &&
+    getUnitTraits(unit.type).includes("escape");
+
+  return !hasActed || canEscape;
 }
 
 export function getValidMoves(state: GameState, unit: Unit): Set<Tile> {

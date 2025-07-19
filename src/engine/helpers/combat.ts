@@ -1,5 +1,5 @@
 // data
-import { getUnitBaseStats } from "@/data/unitBaseStats";
+import { getUnitBaseStats, getUnitTraits } from "@/data/unitBaseStats";
 
 // types
 import type { GameState, Turn, Unit } from "@/types/game";
@@ -18,14 +18,22 @@ export function calculateDamage(
 }
 
 export function canAttack(unit: Unit, turn: Turn): boolean {
-  const { actionPointsRemaining, actionsByUnit } = turn;
+  const { actions, actingUnitId } = turn;
 
-  const unitHasActed = actionsByUnit[unit.id] !== undefined;
-  const actionCost = 1;
+  if (actingUnitId && actingUnitId !== unit.id) return false;
 
-  if (actionPointsRemaining < actionCost && !unitHasActed) return false;
+  const unitTraits = getUnitTraits(unit.type);
 
-  return unit.canAttack;
+  // by default, unit cannot attack if it acted
+  const hasActed = actions.length > 0;
+
+  // unit can attack using dash if it did not attacked
+  const canDash = actions.includes("attack") && unitTraits.includes("dash");
+  // unit can attack using persistant if unit killed in last turn
+  const canPersist =
+    actions[actions.length - 1] === "kill" && unitTraits.includes("persist");
+
+  return !hasActed || canDash || canPersist;
 }
 
 export function getValidAttacks(state: GameState, unit: Unit): Set<Tile> {
