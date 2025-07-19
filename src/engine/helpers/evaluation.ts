@@ -9,13 +9,13 @@ export type GameStateEvaluation = Record<PlayerId, number>;
 
 export const unitValue: Record<UnitType, number> = {
   mindBender: 1000,
-  knight: 8,
-  catapult: 5,
-  archer: 3,
-  rider: 3,
-  warrior: 2,
-  swordsman: 5,
-  defender: 3,
+  knight: 80,
+  catapult: 50,
+  archer: 30,
+  rider: 30,
+  warrior: 10,
+  swordsman: 50,
+  defender: 30,
 };
 
 export const evaluateUnit = (unit: Unit): number => {

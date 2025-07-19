@@ -1,14 +1,16 @@
 import type { GameState } from "@/types/game";
 import { getAllValidUnitActions } from "./actions";
 import { gameEngine } from "../core";
-import type { TurnActions } from "@/types/action";
+import type { GameAction, TurnActions } from "@/types/action";
 
 export interface GameTreeNode {
   state: GameState;
   actions: TurnActions; // actions to reach this state from root state
 }
 
-export const getChildNodes = (rootState: GameState): Set<GameTreeNode> => {
+const getChildNodesBeforeAdvance = (
+  rootState: GameState
+): Set<GameTreeNode> => {
   const allUnitActions = getAllValidUnitActions(rootState);
   const nodes = new Set<GameTreeNode>();
   const nodeStates = new Set<GameState>();
@@ -36,6 +38,22 @@ export const getChildNodes = (rootState: GameState): Set<GameTreeNode> => {
           actions: [curAction, ...subNode.actions],
         });
       }
+    });
+  });
+
+  return nodes;
+};
+
+const advanceAction: GameAction = { type: "advance", payload: {} };
+
+export const getChildNodes = (rootState: GameState): GameTreeNode[] => {
+  const nodesBeforeAdvance = getChildNodesBeforeAdvance(rootState);
+
+  const nodes: GameTreeNode[] = [];
+  nodesBeforeAdvance.forEach((node) => {
+    nodes.push({
+      state: gameEngine(node.state, advanceAction),
+      actions: node.actions,
     });
   });
 
