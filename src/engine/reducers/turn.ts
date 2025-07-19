@@ -6,7 +6,7 @@ import type { UnitActionKey } from "@/types/action";
 // utils
 import { shuffleArray } from "@/utils/common.util";
 
-const basePoints = 3;
+const basePoints = 1;
 
 export function getInitialTurn(players: Players): Turn {
   const order = Object.keys(players) as PlayerId[];

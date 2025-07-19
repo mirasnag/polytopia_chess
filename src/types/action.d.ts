@@ -44,3 +44,5 @@ export type UnitAction = {
 }[UnitActionKey];
 
 export type GameAction = PlayerAction | UnitAction;
+
+export type TurnActions = UnitAction[];

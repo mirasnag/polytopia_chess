@@ -1,12 +1,12 @@
-import type { UnitAction } from "@/types/action";
+import type { TurnActions } from "@/types/action";
 import type { GameState } from "@/types/game";
 import { getAllValidUnitActions } from "../helpers/actions";
 import { evaluatePlayerAction } from "../helpers/evaluation";
 import { getRandomArrayEntry } from "@/utils/common.util";
 import { gameEngine } from "../core";
 
-export const normalBotChooseActions = (state: GameState): UnitAction[] => {
-  const botActions: UnitAction[] = [];
+export const greedyBotAlgo = (state: GameState): TurnActions => {
+  const botActions: TurnActions = [];
   const { turn } = state;
   const currentPlayerId = turn.playerOrder[turn.orderIndex];
 
@@ -19,7 +19,7 @@ export const normalBotChooseActions = (state: GameState): UnitAction[] => {
     if (validActions.length === 0) break;
 
     let bestScore: number = -Infinity;
-    const bestActions: UnitAction[] = [];
+    const bestActions: TurnActions = [];
 
     validActions.forEach((curAction) => {
       const curScore = evaluatePlayerAction(

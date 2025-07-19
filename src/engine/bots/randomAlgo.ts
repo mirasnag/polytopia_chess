@@ -1,11 +1,11 @@
-import type { UnitAction } from "@/types/action";
+import type { TurnActions } from "@/types/action";
 import type { GameState } from "@/types/game";
 import { getAllValidUnitActions } from "../helpers/actions";
 import { getRandomArrayEntry } from "@/utils/common.util";
 import { gameEngine } from "../core";
 
-export const easyBotChooseActions = (state: GameState): UnitAction[] => {
-  const botActions: UnitAction[] = [];
+export const randomBotAlgo = (state: GameState): TurnActions => {
+  const botActions: TurnActions = [];
 
   let currentState: GameState = state;
   const maxNumberOfActions = 5;

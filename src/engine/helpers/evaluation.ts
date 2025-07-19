@@ -24,7 +24,7 @@ export const evaluateUnit = (unit: Unit): number => {
   return Math.round(maxValue * (unit.stats.hp / totalHp));
 };
 
-export const evaluateState = (state: GameState): GameStateEvaluation => {
+export const getStateEvaluation = (state: GameState): GameStateEvaluation => {
   const { units, players } = state;
 
   const scores: GameStateEvaluation = {};
@@ -39,6 +39,22 @@ export const evaluateState = (state: GameState): GameStateEvaluation => {
   return scores;
 };
 
+export const getPlayerScore = (
+  state: GameState,
+  currentPlayerId: PlayerId
+): number => {
+  const { players } = state;
+  const scores = getStateEvaluation(state);
+  let playerScore = 0;
+
+  Object.values(players).forEach((player) => {
+    playerScore +=
+      player.id === currentPlayerId ? scores[player.id] : -scores[player.id];
+  });
+
+  return playerScore;
+};
+
 export const evaluatePlayerAction = (
   state: GameState,
   action: UnitAction,
@@ -47,14 +63,14 @@ export const evaluatePlayerAction = (
   const { players } = state;
 
   const newState = gameEngine(state, action);
-  const scores = evaluateState(newState);
+  const scores = getStateEvaluation(newState);
 
-  let diff = 0;
+  let actionScore = 0;
 
   Object.values(players).forEach((player) => {
-    diff +=
+    actionScore +=
       player.id === currentPlayerId ? scores[player.id] : -scores[player.id];
   });
 
-  return diff;
+  return actionScore;
 };

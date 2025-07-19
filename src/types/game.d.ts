@@ -9,7 +9,7 @@ import {
 } from "@/types/unit";
 import type { GameConfig } from "./gameConfig";
 
-export type BotType = "easy-bot" | "normal-bot";
+export type BotType = "easy-bot" | "normal-bot" | "hard-bot";
 export type PlayerType = "human" | BotType;
 
 export interface PlayerInGame {
