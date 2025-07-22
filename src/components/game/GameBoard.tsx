@@ -74,8 +74,8 @@ const GameBoard: React.FC<Props> = ({ activeTile, setActiveTile }) => {
       dispatch({
         type: "attack",
         payload: {
-          attackingUnitId: activeUnit.id,
-          defendingUnitId: tile.occupantId,
+          unitId: activeUnit.id,
+          to: tile,
         },
       });
       setActiveTile(null);

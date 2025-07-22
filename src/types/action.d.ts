@@ -9,23 +9,23 @@ export type UnitActionKey = MoveActionKey | AttackActionKey | KillActionKey;
 
 export type ActionKey = PlayerActionKey | UnitActionKey;
 
+export type UnitActionPayload = {
+  unitId: UnitId;
+  to: {
+    x: number;
+    y: number;
+  };
+};
+
 type ActionPayloadMap = {
   create: {
     config?: GameConfig;
   };
   resign: {};
   advance: {};
-  move: {
-    unitId: UnitId;
-    to: {
-      x: number;
-      y: number;
-    };
-  };
-  attack: {
-    attackingUnitId: UnitId;
-    defendingUnitId: UnitId;
-  };
+  move: UnitActionPayload;
+  attack: UnitActionPayload;
+  kill: UnitActionPayload;
 };
 
 export type ActionPayloadFor<K extends ActionKey> = ActionPayloadMap[K];

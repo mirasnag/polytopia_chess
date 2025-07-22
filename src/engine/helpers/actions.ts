@@ -27,8 +27,8 @@ export function getValidUnitActions(
     validActions.push({
       type: attackActionKey,
       payload: {
-        attackingUnitId: unit.id,
-        defendingUnitId: attackingTile.occupantId,
+        unitId: unit.id,
+        to: attackingTile,
       },
     });
   });

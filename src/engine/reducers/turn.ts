@@ -1,7 +1,7 @@
 // types
 import type { Players, Turn } from "@/types/game";
-import type { PlayerId, UnitId } from "@/types/id";
-import type { UnitActionKey } from "@/types/action";
+import type { PlayerId } from "@/types/id";
+import type { UnitAction } from "@/types/action";
 
 // utils
 import { shuffleArray } from "@/utils/common.util";
@@ -36,17 +36,13 @@ export function advanceTurn(turn: Turn): Turn {
   };
 }
 
-export function registerUnitAction(
-  turn: Turn,
-  unitId: UnitId,
-  actionKey: UnitActionKey
-): Turn {
+export function registerUnitAction(turn: Turn, action: UnitAction): Turn {
   if (turn.actions.length > 3) {
     throw new Error(`Too many actions: ${turn.actions}`);
   }
   return {
     ...turn,
-    actions: [...turn.actions, actionKey],
-    actingUnitId: unitId,
+    actions: [...turn.actions, action],
+    actingUnitId: action.payload.unitId,
   };
 }

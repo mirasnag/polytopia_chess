@@ -1,14 +1,17 @@
-import type { TurnActions } from "@/types/action";
+import type { GameAction, TurnActions } from "@/types/action";
 import type { GameState } from "@/types/game";
 import { getChildNodes } from "../helpers/gameTree";
 import { getPlayerScore } from "../helpers/evaluation";
 import type { PlayerId } from "@/types/id";
 import { getRandomArrayEntry } from "@/utils/common.util";
+import { gameEngine } from "../core";
 
 interface MinimaxReturn {
   score: number;
   actions: TurnActions[];
 }
+
+const advanceAction: GameAction = { type: "advance", payload: {} };
 
 let start = performance.now();
 const maxSearchTime = 3000; // milli seconds
@@ -45,15 +48,15 @@ export const minimax = (
   }
 
   const isMainPlayer = turn.currentPlayerId === mainPlayerId;
-  const childNodes = getChildNodes(state);
+  const childStates = getChildNodes(state);
 
   if (isMainPlayer) {
     let bestScore = -Infinity;
     let bestActions: TurnActions[] = [];
 
-    for (const node of childNodes) {
+    for (const childState of childStates) {
       const { score: childScore } = minimax(
-        node.state,
+        gameEngine(childState, advanceAction),
         depth - 1,
         mainPlayerId,
         alpha,
@@ -62,9 +65,9 @@ export const minimax = (
 
       if (childScore > bestScore) {
         bestScore = childScore;
-        bestActions = [node.actions];
+        bestActions = [childState.turn.actions];
       } else if (childScore === bestScore) {
-        bestActions.push(node.actions);
+        bestActions.push(childState.turn.actions);
       }
 
       alpha = Math.max(alpha, bestScore);
@@ -79,9 +82,9 @@ export const minimax = (
     let worstScore = Infinity;
     let worstActions: TurnActions[] = [];
 
-    for (const node of childNodes) {
+    for (const childState of childStates) {
       const { score: childScore } = minimax(
-        node.state,
+        gameEngine(childState, advanceAction),
         depth - 1,
         mainPlayerId,
         alpha,
@@ -90,9 +93,9 @@ export const minimax = (
 
       if (childScore < worstScore) {
         worstScore = childScore;
-        worstActions = [node.actions];
+        worstActions = [childState.turn.actions];
       } else if (childScore === worstScore) {
-        worstActions.push(node.actions);
+        worstActions.push(childState.turn.actions);
       }
 
       beta = Math.min(beta, worstScore);

@@ -16,10 +16,10 @@ import { botChooseActions } from "@/engine/bots/index";
 
 // types
 import type { Tile } from "@/types/tile";
+import type { GameAction } from "@/types/action";
 
 // styles
 import classes from "./GameView.module.scss";
-import type { UnitAction } from "@/types/action";
 
 const GameView = () => {
   const { state, units, currentPlayer, outcome, dispatch } = useGame();
@@ -39,7 +39,7 @@ const GameView = () => {
 
     let cancelled = false;
 
-    const runBotAction = async (action: UnitAction) => {
+    const runBotAction = async (action: GameAction) => {
       if (cancelled) return;
       await new Promise((resolve) => setTimeout(resolve, 1000));
       dispatch(action);

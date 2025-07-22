@@ -24,11 +24,13 @@ import { isKing, schemaVersion } from "@/engine/common";
 // utils
 import { createBrandedId } from "@/utils/common.util";
 
+// data
+import { defaultGameConfig } from "@/data/defaultGameConfig";
+
 // types
 import type { GameState, Players } from "@/types/game";
-import type { UnitId } from "@/types/id";
 import type { GameConfig } from "@/types/gameConfig";
-import { defaultGameConfig } from "@/data/defaultGameConfig";
+import type { UnitActionPayload } from "@/types/action";
 
 export function createReducer(
   config: GameConfig = defaultGameConfig
@@ -59,9 +61,9 @@ export function createReducer(
 
 export function moveReducer(
   state: GameState,
-  unitId: UnitId,
-  newPos: { x: number; y: number }
+  payload: UnitActionPayload
 ): GameState {
+  const { unitId, to: newPos } = payload;
   const unit = state.units[unitId];
   const oldPos = unit.position;
 
@@ -69,7 +71,7 @@ export function moveReducer(
 
   const updatedTiles = moveTileOccupant(state.map.tiles, oldPos, newPos);
 
-  const updatedTurn = registerUnitAction(state.turn, unitId, "move");
+  const updatedTurn = registerUnitAction(state.turn, { type: "move", payload });
 
   return {
     ...state,
@@ -84,9 +86,15 @@ export function moveReducer(
 
 export function attackReducer(
   state: GameState,
-  attackingUnitId: UnitId,
-  defendingUnitId: UnitId
+  payload: UnitActionPayload
 ): GameState {
+  const { unitId: attackingUnitId, to } = payload;
+  const defendingUnitId = state.map.tiles[to.y][to.x].occupantId;
+
+  if (!defendingUnitId) {
+    throw new Error("Attacked tile has no unit");
+  }
+
   const attackingUnit = state.units[attackingUnitId];
   const defendingUnit = state.units[defendingUnitId];
   const tiles = state.map.tiles;
@@ -115,11 +123,10 @@ export function attackReducer(
     ? kingCaptureOutcome(attackingUnit.ownerId)
     : { ...state.outcome };
 
-  const updatedTurn = registerUnitAction(
-    state.turn,
-    attackingUnitId,
-    isKilled ? "kill" : "attack"
-  );
+  const updatedTurn = registerUnitAction(state.turn, {
+    type: isKilled ? "kill" : "attack",
+    payload,
+  });
 
   return {
     ...state,

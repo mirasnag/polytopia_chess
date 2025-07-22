@@ -47,11 +47,10 @@ export const applyAction = (
     case "advance":
       return advanceReducer(state);
     case "move":
-      const { unitId, to } = action.payload;
-      return moveReducer(state, unitId, to);
+      return moveReducer(state, action.payload);
+    case "kill":
     case "attack":
-      const { attackingUnitId, defendingUnitId } = action.payload;
-      return attackReducer(state, attackingUnitId, defendingUnitId);
+      return attackReducer(state, action.payload);
 
     default:
       return state;

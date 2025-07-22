@@ -13,9 +13,11 @@ export function canMove(unit: Unit, turn: Turn): boolean {
   // by default, unit cannot move after if it acted
   const hasActed = actions.length > 0;
 
+  const actionKeys = actions.map((action) => action.type);
+
   // unit can escape if the last action is not move (attack or kill)
   const canEscape =
-    actions[actions.length - 1] !== "move" &&
+    actionKeys[actionKeys.length - 1] !== "move" &&
     getUnitTraits(unit.type).includes("escape");
 
   return !hasActed || canEscape;

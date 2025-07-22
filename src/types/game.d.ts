@@ -8,6 +8,7 @@ import {
   type UnitStats,
 } from "@/types/unit";
 import type { GameConfig } from "./gameConfig";
+import type { GameAction } from "./action";
 
 export type BotType = "easy-bot" | "normal-bot" | "hard-bot" | "crazy-bot";
 export type PlayerType = "human" | BotType;
@@ -37,7 +38,7 @@ export interface Turn {
   currentPlayerId: PlayerId;
 
   actingUnitId: UnitId | null;
-  actions: ActionKey[];
+  actions: GameAction[];
 }
 
 export type GameOutcome =
