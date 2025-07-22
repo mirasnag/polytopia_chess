@@ -41,6 +41,9 @@ export function registerUnitAction(
   unitId: UnitId,
   actionKey: UnitActionKey
 ): Turn {
+  if (turn.actions.length > 3) {
+    throw new Error(`Too many actions: ${turn.actions}`);
+  }
   return {
     ...turn,
     actions: [...turn.actions, actionKey],

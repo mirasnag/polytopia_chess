@@ -10,13 +10,17 @@ interface MinimaxReturn {
   actions: TurnActions[];
 }
 
+let start = performance.now();
+const maxSearchTime = 3000; // milli seconds
+
 export const minimaxBotAlgo = (
   state: GameState,
   turnDepth: number = 1
 ): TurnActions => {
   const { currentPlayerId, playerOrder } = state.turn;
   const playerCnt = playerOrder.length;
-  const { actions } = minimax(state, playerCnt * turnDepth, currentPlayerId);
+  const depth = playerCnt * turnDepth;
+  const { actions } = minimax(state, depth, currentPlayerId);
   const randomBestAction = getRandomArrayEntry(actions);
 
   return randomBestAction;
@@ -25,8 +29,14 @@ export const minimaxBotAlgo = (
 export const minimax = (
   state: GameState,
   depth: number,
-  mainPlayerId: PlayerId
+  mainPlayerId: PlayerId,
+  alpha = -Infinity,
+  beta = Infinity
 ): MinimaxReturn => {
+  if (performance.now() - start > maxSearchTime) {
+    return { score: getPlayerScore(state, mainPlayerId), actions: [] };
+  }
+
   const { outcome, turn } = state;
   const isFinished = outcome.status === "finished";
 
@@ -38,80 +48,60 @@ export const minimax = (
   const childNodes = getChildNodes(state);
 
   if (isMainPlayer) {
-    let score = -Infinity;
-    let actions: TurnActions[] = [];
+    let bestScore = -Infinity;
+    let bestActions: TurnActions[] = [];
 
-    childNodes.forEach((childNode) => {
+    for (const node of childNodes) {
       const { score: childScore } = minimax(
-        childNode.state,
+        node.state,
         depth - 1,
-        mainPlayerId
+        mainPlayerId,
+        alpha,
+        beta
       );
-      if (score < childScore) {
-        score = childScore;
-        actions = [childNode.actions];
-      } else if (score === childScore) {
-        actions.push(childNode.actions);
+
+      if (childScore > bestScore) {
+        bestScore = childScore;
+        bestActions = [node.actions];
+      } else if (childScore === bestScore) {
+        bestActions.push(node.actions);
       }
-    });
+
+      alpha = Math.max(alpha, bestScore);
+      if (beta <= alpha) break;
+    }
 
     return {
-      score,
-      actions,
+      score: bestScore,
+      actions: bestActions,
     };
   } else {
-    let score = Infinity;
-    let actions: TurnActions[] = [];
+    let worstScore = Infinity;
+    let worstActions: TurnActions[] = [];
 
-    childNodes.forEach((childNode) => {
+    for (const node of childNodes) {
       const { score: childScore } = minimax(
-        childNode.state,
+        node.state,
         depth - 1,
-        mainPlayerId
+        mainPlayerId,
+        alpha,
+        beta
       );
-      if (score > childScore) {
-        score = childScore;
-        actions = [childNode.actions];
-      } else if (score === childScore) {
-        actions.push(childNode.actions);
+
+      if (childScore < worstScore) {
+        worstScore = childScore;
+        worstActions = [node.actions];
+      } else if (childScore === worstScore) {
+        worstActions.push(node.actions);
       }
-    });
+
+      beta = Math.min(beta, worstScore);
+      if (beta <= alpha) break;
+    }
 
     return {
-      score,
-      actions,
+      score: worstScore,
+      actions: worstActions,
     };
   }
-};
-
-export const bestPlayerScore = (
-  state: GameState,
-  playerId: PlayerId
-): number => {
-  const nodes = getChildNodes(state);
-
-  let bestScore = -Infinity;
-
-  nodes.forEach((node) => {
-    const curScore = getPlayerScore(node.state, playerId);
-    bestScore = Math.max(bestScore, curScore);
-  });
-
-  return bestScore;
-};
-
-export const worstPlayerScore = (
-  state: GameState,
-  playerId: PlayerId
-): number => {
-  const nodes = getChildNodes(state);
-
-  let worstScore = Infinity;
-
-  nodes.forEach((node) => {
-    const curScore = getPlayerScore(node.state, playerId);
-    worstScore = Math.min(worstScore, curScore);
-  });
-
-  return worstScore;
 };

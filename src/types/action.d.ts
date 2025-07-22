@@ -46,4 +46,4 @@ export type UnitAction = {
 
 export type GameAction = PlayerAction | UnitAction;
 
-export type TurnActions = UnitAction[];
+export type TurnActions = GameAction[];

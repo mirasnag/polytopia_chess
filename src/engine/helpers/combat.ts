@@ -28,7 +28,11 @@ export function canAttack(unit: Unit, turn: Turn): boolean {
   const hasActed = actions.length > 0;
 
   // unit can attack using dash if it did not attacked
-  const canDash = actions.includes("attack") && unitTraits.includes("dash");
+  const canDash =
+    !actions.includes("attack") &&
+    !actions.includes("kill") &&
+    unitTraits.includes("dash");
+
   // unit can attack using persistant if unit killed in last turn
   const canPersist =
     actions[actions.length - 1] === "kill" && unitTraits.includes("persist");

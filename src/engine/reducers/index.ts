@@ -11,7 +11,7 @@ import {
   createUnits,
   attackUnit,
   moveUnit,
-  resetAllUnitState,
+  // resetAllUnitState,
 } from "@/engine/reducers/units";
 import {
   advanceTurn,
@@ -145,11 +145,9 @@ export function resignReducer(state: GameState): GameState {
 
 export function advanceReducer(state: GameState): GameState {
   const updatedTurn = advanceTurn(state.turn);
-  const updatedUnits = resetAllUnitState(state.units);
 
   return {
     ...state,
     turn: updatedTurn,
-    units: updatedUnits,
   };
 }

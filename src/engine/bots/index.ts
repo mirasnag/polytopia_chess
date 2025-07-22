@@ -14,7 +14,9 @@ export const botChooseActions = (
     case "normal-bot":
       return greedyBotAlgo(state);
     case "hard-bot":
-      return minimaxBotAlgo(state);
+      return minimaxBotAlgo(state, 1);
+    case "crazy-bot":
+      return minimaxBotAlgo(state, 2);
     default:
       throw new Error("Unhandled or invalid bot type:", botType);
   }

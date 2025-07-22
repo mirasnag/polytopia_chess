@@ -4,7 +4,7 @@ import { getUnitBaseStats, getUnitTraits } from "@/data/unitBaseStats";
 import { calculateDamage } from "@/engine/helpers/combat";
 
 // types
-import type { Unit, Units } from "@/types/game";
+import type { Units } from "@/types/game";
 import type { PlayerId, UnitId } from "@/types/id";
 import type { UnitType } from "@/types/unit";
 
@@ -60,26 +60,6 @@ export function createUnits(playerA: PlayerId, playerB: PlayerId): Units {
   placeRowUnits(units, playerB, warriorRowUnits, 6);
 
   return units;
-}
-
-function resetUnitState(unit: Unit): Unit {
-  const baseStats = getUnitBaseStats(unit.type);
-
-  return {
-    ...unit,
-    stats: {
-      ...baseStats,
-      hp: unit.stats.hp,
-    },
-  };
-}
-
-export function resetAllUnitState(units: Units): Units {
-  const updatedUnits = Object.fromEntries(
-    Object.entries(units).map(([id, unit]) => [id, resetUnitState(unit)])
-  );
-
-  return updatedUnits;
 }
 
 export function moveUnit(
