@@ -5,6 +5,9 @@ import { getUnitBaseStats, getUnitTraits } from "@/data/unitBaseStats";
 import type { GameState, Turn, Unit } from "@/types/game";
 import type { Tile } from "@/types/tile";
 
+// helpers
+import { getMapTiles } from "./map";
+
 const baseDamage = 5;
 
 export function calculateDamage(
@@ -52,7 +55,9 @@ export function getValidAttacks(state: GameState, unit: Unit): Set<Tile> {
 
   const { range } = getUnitBaseStats(unit.type);
   const { x, y } = unit.position;
-  const { width, height, tiles } = state.map;
+  const { width, height } = state.map;
+
+  const tiles = getMapTiles(state);
   const units = state.units;
 
   const minX = Math.max(0, x - range);
@@ -72,4 +77,24 @@ export function getValidAttacks(state: GameState, unit: Unit): Set<Tile> {
   }
 
   return validAttacks;
+}
+
+export function getValidAttacksMask(
+  state: GameState,
+  unit: Unit | null
+): boolean[][] {
+  const { width, height } = state.map;
+  const mask = Array.from({ length: height }, () =>
+    Array.from({ length: width }, () => false)
+  );
+
+  if (!unit) return mask;
+
+  const validAttacks = getValidAttacks(state, unit);
+
+  validAttacks.forEach((attack) => {
+    mask[attack.y][attack.x] = true;
+  });
+
+  return mask;
 }

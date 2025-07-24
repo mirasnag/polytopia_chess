@@ -6,8 +6,8 @@ import { useGame } from "@/context/game/GameContext";
 import BoardTile from "./BoardTile";
 
 // utils
-import { getValidAttacks } from "@/engine/helpers/combat";
-import { getValidMoves } from "@/engine/helpers/movement";
+import { getValidAttacksMask } from "@/engine/helpers/combat";
+import { getValidMovesMask } from "@/engine/helpers/movement";
 
 // types
 import type { Tile } from "@/types/tile";
@@ -32,13 +32,13 @@ const GameBoard: React.FC<Props> = ({ activeTile, setActiveTile }) => {
     return unit?.ownerId === currentPlayer.id ? unit : null;
   }, [activeTile, units, currentPlayer]);
 
-  const validMoves = useMemo(
-    () => (activeUnit ? getValidMoves(state, activeUnit) : new Set<Tile>()),
+  const moveMask = useMemo(
+    () => getValidMovesMask(state, activeUnit),
     [activeUnit, state]
   );
 
-  const validAttacks = useMemo(
-    () => (activeUnit ? getValidAttacks(state, activeUnit) : new Set<Tile>()),
+  const attackMask = useMemo(
+    () => getValidAttacksMask(state, activeUnit),
     [activeUnit, state]
   );
 
@@ -55,7 +55,7 @@ const GameBoard: React.FC<Props> = ({ activeTile, setActiveTile }) => {
       return;
     }
 
-    if (validMoves.has(tile)) {
+    if (moveMask[tile.y][tile.x]) {
       if (tile.occupantId)
         throw new Error("Cannot move unit - tile is occupied!");
 
@@ -67,7 +67,7 @@ const GameBoard: React.FC<Props> = ({ activeTile, setActiveTile }) => {
       return;
     }
 
-    if (validAttacks.has(tile)) {
+    if (attackMask[tile.y][tile.x]) {
       if (!tile.occupantId)
         throw new Error("Cannot attack unit - tile is not occupied!");
 
@@ -95,8 +95,8 @@ const GameBoard: React.FC<Props> = ({ activeTile, setActiveTile }) => {
               tile={tile}
               tileState={{
                 isActive: activeTile === tile,
-                isValidAttack: validAttacks.has(tile),
-                isValidMove: validMoves.has(tile),
+                isValidMove: moveMask[tile.y][tile.x] ?? false,
+                isValidAttack: attackMask[tile.y][tile.x] ?? false,
               }}
               handleTileClick={handleTileClick}
             />

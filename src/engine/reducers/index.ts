@@ -1,13 +1,5 @@
 // helpers
 import {
-  applyUnitsToMap,
-  copyTiles,
-  createMap,
-  moveTileOccupant,
-  removeTileOccupant,
-  replaceTileOccupant,
-} from "@/engine/reducers/map";
-import {
   createUnits,
   attackUnit,
   moveUnit,
@@ -20,6 +12,7 @@ import {
 } from "@/engine/reducers/turn";
 import { kingCaptureOutcome, resignOutcome } from "@/engine/reducers/outcome";
 import { isKing, schemaVersion } from "@/engine/common";
+import { getOccupantIdAt } from "../helpers/map";
 
 // utils
 import { createBrandedId } from "@/utils/common.util";
@@ -40,7 +33,6 @@ export function createReducer(
   const playerB = createBrandedId("player");
 
   const units = createUnits(playerA, playerB);
-  const map = applyUnitsToMap(createMap(), units);
 
   const players: Players = {
     [playerA]: { id: playerA, name: "A", type: playerTypes[0] },
@@ -52,7 +44,10 @@ export function createReducer(
     schemaVersion: schemaVersion,
     players: players,
     units: units,
-    map: map,
+    map: {
+      width: 8,
+      height: 8,
+    },
     turn: updatedTurn,
     outcome: { status: "ongoing" },
     config: config,
@@ -64,22 +59,13 @@ export function moveReducer(
   payload: UnitActionPayload
 ): GameState {
   const { unitId, to: newPos } = payload;
-  const unit = state.units[unitId];
-  const oldPos = unit.position;
 
   const updatedUnits = moveUnit(state.units, unitId, newPos);
-
-  const updatedTiles = moveTileOccupant(state.map.tiles, oldPos, newPos);
-
   const updatedTurn = registerUnitAction(state.turn, { type: "move", payload });
 
   return {
     ...state,
     units: updatedUnits,
-    map: {
-      ...state.map,
-      tiles: updatedTiles,
-    },
     turn: updatedTurn,
   };
 }
@@ -89,7 +75,7 @@ export function attackReducer(
   payload: UnitActionPayload
 ): GameState {
   const { unitId: attackingUnitId, to } = payload;
-  const defendingUnitId = state.map.tiles[to.y][to.x].occupantId;
+  const defendingUnitId = getOccupantIdAt(to.x, to.y, state.units);
 
   if (!defendingUnitId) {
     throw new Error("Attacked tile has no unit");
@@ -97,7 +83,6 @@ export function attackReducer(
 
   const attackingUnit = state.units[attackingUnitId];
   const defendingUnit = state.units[defendingUnitId];
-  const tiles = state.map.tiles;
 
   const updatedUnits = attackUnit(
     state.units,
@@ -106,19 +91,8 @@ export function attackReducer(
   );
 
   const isKilled = updatedUnits[defendingUnitId] === undefined;
-  const isMeleeRangedUnit = attackingUnit.stats.range === 1;
-
-  const updatedTiles = isKilled
-    ? isMeleeRangedUnit
-      ? replaceTileOccupant(
-          tiles,
-          attackingUnit.position,
-          defendingUnit.position
-        )
-      : removeTileOccupant(tiles, defendingUnit.position)
-    : copyTiles(tiles);
-
   const isKingKilled = isKing(defendingUnit) && isKilled;
+
   const updatedOutcome = isKingKilled
     ? kingCaptureOutcome(attackingUnit.ownerId)
     : { ...state.outcome };
@@ -131,10 +105,6 @@ export function attackReducer(
   return {
     ...state,
     units: updatedUnits,
-    map: {
-      ...state.map,
-      tiles: updatedTiles,
-    },
     turn: updatedTurn,
     outcome: updatedOutcome,
   };

@@ -11,5 +11,4 @@ export interface Tile {
 export interface MapGrid {
   width: number;
   height: number;
-  tiles: Tile[][];
 }

@@ -25,7 +25,7 @@ export function getValidUnitActions(
       type: attackActionKey,
       payload: {
         unitId: unit.id,
-        to: attackingTile,
+        to: { x: attackingTile.x, y: attackingTile.y },
       },
     });
   });
