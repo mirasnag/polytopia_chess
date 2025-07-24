@@ -43,7 +43,11 @@ export const getPlayerScore = (
   state: GameState,
   playerId: PlayerId
 ): number => {
-  const { players } = state;
+  const { players, outcome } = state;
+  if (outcome.status === "finished") {
+    return outcome.winnerId === playerId ? Infinity : -Infinity;
+  }
+
   const scores = getStateEvaluation(state);
   let playerScore = 0;
 
