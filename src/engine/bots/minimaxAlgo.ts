@@ -14,7 +14,7 @@ interface MinimaxReturn {
 const advanceAction: GameAction = { type: "advance", payload: {} };
 
 let start = performance.now();
-const maxSearchTime = 3000; // milli seconds
+const maxSearchTime = 3000; // milliseconds
 
 export const minimaxBotAlgo = (
   state: GameState,
@@ -23,10 +23,12 @@ export const minimaxBotAlgo = (
   const { currentPlayerId, playerOrder } = state.turn;
   const playerCnt = playerOrder.length;
   const depth = playerCnt * turnDepth;
+
+  start = performance.now();
   const { actions } = minimax(state, depth, currentPlayerId);
   const randomBestAction = getRandomArrayEntry(actions);
 
-  return randomBestAction;
+  return randomBestAction ?? [];
 };
 
 export const minimax = (
@@ -49,6 +51,7 @@ export const minimax = (
 
   const isMainPlayer = turn.currentPlayerId === mainPlayerId;
   const childStates = getChildNodes(state);
+  childStates.sort(stateComp);
 
   if (isMainPlayer) {
     let bestScore = -Infinity;
@@ -108,3 +111,21 @@ export const minimax = (
     };
   }
 };
+
+function stateComp(a: GameState, b: GameState): number {
+  if (a.outcome.status === "finished") return -1;
+  if (b.outcome.status === "finished") return 1;
+
+  let score = 0;
+  a.turn.actions.forEach((action) => {
+    if (action.type === "kill") score -= 5;
+    if (action.type === "attack") score -= 1;
+  });
+
+  b.turn.actions.forEach((action) => {
+    if (action.type === "kill") score += 5;
+    if (action.type === "attack") score += 1;
+  });
+
+  return score;
+}

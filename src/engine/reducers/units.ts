@@ -1,6 +1,6 @@
 // utils
 import { createBrandedId } from "@/utils/common.util";
-import { getUnitBaseStats, getUnitTraits } from "@/data/unitBaseStats";
+import { getUnitBaseStats } from "@/data/unitBaseStats";
 import { calculateDamage } from "@/engine/helpers/combat";
 
 // types
@@ -67,14 +67,12 @@ export function moveUnit(
   movingUnitId: UnitId,
   to: { x: number; y: number }
 ): Units {
-  const movingUnit = {
-    ...units[movingUnitId],
-    position: to,
-  };
-
   return {
     ...units,
-    [movingUnitId]: movingUnit,
+    [movingUnitId]: {
+      ...units[movingUnitId],
+      position: to,
+    },
   };
 }
 
@@ -87,24 +85,9 @@ export function attackUnit(
   const defendingUnit = units[defendingUnitId];
 
   const damage = calculateDamage(attackingUnit, defendingUnit);
-
   const isKilled = defendingUnit.stats.hp <= damage;
-  const isMeleeRangedUnit = attackingUnit.stats.range === 1;
 
-  const traits = getUnitTraits(attackingUnit.type);
-
-  const updatedUnits: Units = {
-    ...units,
-    [attackingUnitId]: {
-      ...attackingUnit,
-      position:
-        isKilled && isMeleeRangedUnit
-          ? defendingUnit.position
-          : attackingUnit.position,
-      canAttack: isKilled && traits.includes("persist"),
-      canMove: traits.includes("escape"),
-    },
-  };
+  const updatedUnits: Units = { ...units };
 
   if (!isKilled) {
     updatedUnits[defendingUnitId] = {
@@ -115,6 +98,14 @@ export function attackUnit(
       },
     };
   } else {
+    const isMeleeRangedUnit = attackingUnit.stats.range === 1;
+    updatedUnits[attackingUnitId] = {
+      ...attackingUnit,
+      position: isMeleeRangedUnit
+        ? defendingUnit.position
+        : attackingUnit.position,
+    };
+
     delete updatedUnits[defendingUnitId];
   }
 
