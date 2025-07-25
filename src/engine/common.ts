@@ -1,6 +1,5 @@
 // types
-import type { Unit } from "@/types/game";
-import type { UnitType } from "@/types/unit";
+import type { UnitType, Unit } from "@/types/unit";
 
 export const schemaVersion = {
   major: 1,

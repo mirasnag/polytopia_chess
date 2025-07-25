@@ -1,9 +1,12 @@
+// helpers
 import { getUnitBaseStats } from "@/data/unitBaseStats";
-import type { UnitAction } from "@/types/action";
-import type { GameState, Unit } from "@/types/game";
-import type { PlayerId } from "@/types/id";
-import type { UnitType } from "@/types/unit";
 import { gameEngine } from "../core";
+
+// types
+import type { UnitAction } from "@/types/action";
+import type { GameState } from "@/types/game";
+import type { PlayerId } from "@/types/id";
+import type { UnitType, Unit } from "@/types/unit";
 
 export type GameStateEvaluation = Record<PlayerId, number>;
 

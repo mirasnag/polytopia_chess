@@ -3,13 +3,13 @@ import UnitModel from "../unit/UnitModel";
 
 // data
 import { getUnitBaseStats, getUnitTraits } from "@/data/unitBaseStats";
+import { UNIT_TRAITS } from "@/data/unitTraits";
 
 // types
-import type { Unit } from "@/types/game";
+import type { Unit } from "@/types/unit";
 
 // styles
 import classes from "./UnitPanel.module.scss";
-import { UNIT_TRAITS } from "@/data/unitTraits";
 
 interface Props {
   unit: Unit;

@@ -1,4 +1,5 @@
-import type { GameState, Unit } from "@/types/game";
+import type { GameState } from "@/types/game";
+import type { Unit } from "@/types/unit";
 import { useEffect } from "react";
 
 export function prettyLogUnits(state: GameState): void {

@@ -1,5 +1,5 @@
 // types
-import type { Unit } from "@/types/game";
+import type { Unit } from "@/types/unit";
 
 // styles
 import classes from "./UnitTileView.module.scss";

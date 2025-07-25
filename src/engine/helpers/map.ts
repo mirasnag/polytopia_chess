@@ -1,6 +1,7 @@
-import type { GameState, Units } from "@/types/game";
+import type { GameState } from "@/types/game";
 import type { UnitId } from "@/types/id";
 import type { Tile } from "@/types/tile";
+import type { Units } from "@/types/unit";
 
 type Occupant = UnitId | null;
 

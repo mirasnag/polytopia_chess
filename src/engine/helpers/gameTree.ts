@@ -1,7 +1,11 @@
-import type { GameState, Units } from "@/types/game";
+// helpers
 import { getValidUnitActions } from "./actions";
 import { gameEngine } from "../core";
+
+// types
+import type { GameState } from "@/types/game";
 import type { UnitId } from "@/types/id";
+import type { Units } from "@/types/unit";
 
 type GameTreeNode = GameState;
 

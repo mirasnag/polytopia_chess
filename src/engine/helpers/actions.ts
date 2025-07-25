@@ -1,10 +1,11 @@
 // types
-import type { GameState, Unit } from "@/types/game";
+import type { GameState } from "@/types/game";
 import type {
   AttackActionKey,
   MoveActionKey,
   UnitAction,
 } from "@/types/action";
+import type { Unit } from "@/types/unit";
 
 // helpers
 import { getValidAttacks } from "./combat";

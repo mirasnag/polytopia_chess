@@ -2,8 +2,9 @@
 import { getUnitBaseStats, getUnitTraits } from "@/data/unitBaseStats";
 
 // types
-import type { GameState, Turn, Unit } from "@/types/game";
+import type { GameState, Turn } from "@/types/game";
 import type { Tile } from "@/types/tile";
+import type { Unit } from "@/types/unit";
 
 // helpers
 import { getMapTiles } from "./map";
