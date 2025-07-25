@@ -1,13 +1,7 @@
 // types
-import type { GameId, PlayerId, UnitId } from "@/types/id";
+import type { PlayerId, UnitId } from "@/types/id";
 import type { MapGrid } from "@/types/tile";
-import type {
-  UnitType,
-  ActionKey,
-  UnitSkillKey,
-  UnitStats,
-  Units,
-} from "@/types/unit";
+import type { Units } from "@/types/unit";
 import type { GameConfig } from "./gameConfig";
 import type { GameAction } from "./action";
 

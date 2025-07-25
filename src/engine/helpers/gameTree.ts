@@ -15,7 +15,11 @@ export function expandUnitBranchNodes(
 ): GameTreeNode[] {
   const res: GameTreeNode[] = [];
   const stateSet = new Set<Units>();
-  const unit = state.units[unitId];
+  const unit = state.units.get(unitId);
+
+  if (!unit) {
+    throw new Error("Unit not found!");
+  }
 
   const singleActions = getValidUnitActions(state, unit);
 
@@ -40,7 +44,7 @@ export const getChildNodes = (rootState: GameState): GameTreeNode[] => {
   const units = rootState.units;
   const currentPlayerId = rootState.turn.currentPlayerId;
 
-  Object.values(units).forEach((unit) => {
+  units.forEach((unit) => {
     if (unit.ownerId === currentPlayerId) {
       const unitBranchNodes = expandUnitBranchNodes(rootState, unit.id);
       nodes.push(...unitBranchNodes);

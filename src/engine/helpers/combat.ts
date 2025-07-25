@@ -71,7 +71,7 @@ export function getValidAttacks(state: GameState, unit: Unit): Set<Tile> {
       const anotherUnitId = tiles[ny][nx].occupantId;
       if (!anotherUnitId) continue;
 
-      if (units[anotherUnitId].ownerId !== unit.ownerId) {
+      if (units.get(anotherUnitId)?.ownerId !== unit.ownerId) {
         validAttacks.add(tiles[ny][nx]);
       }
     }

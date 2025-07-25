@@ -1,17 +1,28 @@
 import type { GameState } from "@/types/game";
-import type { Unit } from "@/types/unit";
+import type { Unit, UnitType } from "@/types/unit";
 import { useEffect } from "react";
+
+interface UnitLog {
+  // ID: UnitId,
+  Type: UnitType;
+  // Owner: PlayerId,
+  X: number;
+  Y: number;
+  HP: number;
+}
 
 export function prettyLogUnits(state: GameState): void {
   // Convert units record into an array of display rows
-  const rows = Object.values(state.units).map((u: Unit) => ({
-    // ID: u.id,
-    Type: u.type,
-    // Owner: u.ownerId,
-    X: u.position.x,
-    Y: u.position.y,
-    HP: u.stats.hp,
-  }));
+  const rows: UnitLog[] = [];
+
+  state.units.forEach((u: Unit) =>
+    rows.push({
+      Type: u.type,
+      X: u.position.x,
+      Y: u.position.y,
+      HP: u.stats.hp,
+    })
+  );
 
   console.groupCollapsed(`Units (${rows.length})`);
   console.table(rows);
@@ -30,7 +41,7 @@ export function prettyLogBoard(state: GameState): void {
   );
 
   // 2. Fill in unit symbols (first letter of type, uppercase)
-  Object.values(units).forEach((u) => {
+  units.forEach((u) => {
     const { x, y } = u.position;
     const symbol = u.type.charAt(0).toUpperCase();
     board[y][x] = symbol;

@@ -26,7 +26,7 @@ interface Props {
 const BoardTile: React.FC<Props> = ({ tile, handleTileClick, tileState }) => {
   const { isActive, isValidAttack, isValidMove } = tileState;
   const { currentPlayer, units } = useGame();
-  const tileUnit = tile.occupantId ? units[tile.occupantId] : null;
+  const tileUnit = tile.occupantId ? units.get(tile.occupantId) : null;
 
   const tileClassName = `${classes.tile} ${isActive ? classes.active : ""} ${
     isValidAttack ? classes.validAttack : ""

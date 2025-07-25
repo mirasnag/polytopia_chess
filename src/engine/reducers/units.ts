@@ -1,3 +1,6 @@
+// libraries
+import { Map as IMap } from "immutable";
+
 // utils
 import { createBrandedId } from "@/utils/common.util";
 import { getUnitBaseStats } from "@/data/unitBaseStats";
@@ -5,7 +8,7 @@ import { calculateDamage } from "@/engine/helpers/combat";
 
 // types
 import type { PlayerId, UnitId } from "@/types/id";
-import type { UnitType, Units } from "@/types/unit";
+import { UnitRecord, type UnitType, type Units } from "@/types/unit";
 
 const edgeRowUnits: UnitType[] = [
   "catapult",
@@ -39,24 +42,28 @@ function placeRowUnits(
     const unitId = createBrandedId("unit");
     const unitType = unitTypes[col];
 
-    units[unitId] = {
+    const u = new UnitRecord({
       id: unitId,
       type: unitType,
       ownerId: owner,
       position: { x: col, y: row },
       stats: getUnitBaseStats(unitType),
-    };
+    });
+
+    units = units.set(unitId, u);
   }
+
+  return units;
 }
 
 export function createUnits(playerA: PlayerId, playerB: PlayerId): Units {
-  const units: Units = {};
+  let units = IMap<UnitId, UnitRecord>();
 
-  placeRowUnits(units, playerA, edgeRowUnits, 0);
-  placeRowUnits(units, playerA, warriorRowUnits, 1);
+  units = placeRowUnits(units, playerA, edgeRowUnits, 0);
+  units = placeRowUnits(units, playerA, warriorRowUnits, 1);
 
-  placeRowUnits(units, playerB, edgeRowUnits, 7);
-  placeRowUnits(units, playerB, warriorRowUnits, 6);
+  units = placeRowUnits(units, playerB, edgeRowUnits, 7);
+  units = placeRowUnits(units, playerB, warriorRowUnits, 6);
 
   return units;
 }
@@ -66,13 +73,7 @@ export function moveUnit(
   movingUnitId: UnitId,
   to: { x: number; y: number }
 ): Units {
-  return {
-    ...units,
-    [movingUnitId]: {
-      ...units[movingUnitId],
-      position: to,
-    },
-  };
+  return units.update(movingUnitId, (u) => u?.move(to));
 }
 
 export function attackUnit(
@@ -80,33 +81,31 @@ export function attackUnit(
   attackingUnitId: UnitId,
   defendingUnitId: UnitId
 ): Units {
-  const attackingUnit = units[attackingUnitId];
-  const defendingUnit = units[defendingUnitId];
+  const attackingUnit = units.get(attackingUnitId);
+  const defendingUnit = units.get(defendingUnitId);
+
+  if (!attackingUnit || !defendingUnit) {
+    throw new Error("Unit not found");
+  }
 
   const damage = calculateDamage(attackingUnit, defendingUnit);
   const isKilled = defendingUnit.stats.hp <= damage;
 
-  const updatedUnits: Units = { ...units };
-
-  if (!isKilled) {
-    updatedUnits[defendingUnitId] = {
-      ...defendingUnit,
-      stats: {
-        ...defendingUnit.stats,
-        hp: defendingUnit.stats.hp - damage,
-      },
-    };
+  if (isKilled) {
+    if (attackingUnit.stats.range === 1) {
+      units = units.set(
+        attackingUnitId,
+        attackingUnit.set("position", defendingUnit.position)
+      );
+    }
+    units = units.delete(defendingUnitId);
   } else {
-    const isMeleeRangedUnit = attackingUnit.stats.range === 1;
-    updatedUnits[attackingUnitId] = {
-      ...attackingUnit,
-      position: isMeleeRangedUnit
-        ? defendingUnit.position
-        : attackingUnit.position,
-    };
-
-    delete updatedUnits[defendingUnitId];
+    const damagedDefender = defendingUnit.set("stats", {
+      ...defendingUnit.stats,
+      hp: defendingUnit.stats.hp - damage,
+    });
+    units = units.set(defendingUnitId, damagedDefender);
   }
 
-  return updatedUnits;
+  return units;
 }

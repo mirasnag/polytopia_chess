@@ -48,15 +48,17 @@ export function getValidUnitActions(
 export function getAllValidUnitActions(state: GameState): UnitAction[] {
   if (state.outcome.status === "finished") return [];
 
-  const validActions: UnitAction[] = [];
   const { turn, units } = state;
   const { currentPlayerId, actingUnitId } = turn;
 
   if (actingUnitId) {
-    return getValidUnitActions(state, units[actingUnitId]);
+    const actingUnit = units.get(actingUnitId);
+
+    return actingUnit ? getValidUnitActions(state, actingUnit) : [];
   }
 
-  Object.values(units).forEach((unit) => {
+  const validActions: UnitAction[] = [];
+  units.forEach((unit) => {
     if (unit.ownerId === currentPlayerId) {
       const validUnitActions = getValidUnitActions(state, unit);
 

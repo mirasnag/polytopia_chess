@@ -6,6 +6,7 @@ import type { Dispatch, ReactNode } from "react";
 import type { GameState, PlayerInGame } from "@/types/game";
 import type { GameAction } from "@/types/action";
 import type { Tile } from "@/types/tile";
+import type { Units } from "@/types/unit";
 
 // helpers
 import { createReducer } from "@/engine/reducers/index";
@@ -15,7 +16,7 @@ import { getMapTiles } from "@/engine/helpers/map";
 
 export const GameContext = createContext<{
   state: GameState;
-  units: GameState["units"];
+  units: Units;
   tiles: Tile[][];
   turn: GameState["turn"];
   players: GameState["players"];

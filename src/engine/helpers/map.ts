@@ -6,9 +6,10 @@ import type { Units } from "@/types/unit";
 type Occupant = UnitId | null;
 
 export function getOccupantIdAt(x: number, y: number, units: Units): Occupant {
-  for (const u of Object.values(units)) {
-    if (u.position.x === x && u.position.y === y) return u.id;
+  for (const unit of units.values()) {
+    if (unit.position.x === x && unit.position.y === y) return unit.id;
   }
+
   return null;
 }
 
@@ -25,9 +26,9 @@ export function getMapTiles(state: GameState): Tile[][] {
     tiles.push(row);
   }
 
-  Object.values(units).forEach((unit) => {
+  for (const unit of units.values()) {
     tiles[unit.position.y][unit.position.x].occupantId = unit.id;
-  });
+  }
 
   return tiles;
 }

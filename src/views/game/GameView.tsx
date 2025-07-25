@@ -30,7 +30,7 @@ const GameView = () => {
 
   const activeUnit = useMemo(() => {
     if (!activeUnitId) return null;
-    const unit = units[activeUnitId];
+    const unit = units.get(activeUnitId);
     return unit?.ownerId === currentPlayer.id ? unit : null;
   }, [activeTile, units, currentPlayer]);
 

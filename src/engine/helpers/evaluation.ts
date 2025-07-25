@@ -35,7 +35,7 @@ export const getStateEvaluation = (state: GameState): GameStateEvaluation => {
     scores[player.id] = 0;
   });
 
-  Object.values(units).forEach((unit) => {
+  units.forEach((unit) => {
     scores[unit.ownerId] += evaluateUnit(unit);
   });
 

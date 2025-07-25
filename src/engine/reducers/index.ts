@@ -81,8 +81,12 @@ export function attackReducer(
     throw new Error("Attacked tile has no unit");
   }
 
-  const attackingUnit = state.units[attackingUnitId];
-  const defendingUnit = state.units[defendingUnitId];
+  const attackingUnit = state.units.get(attackingUnitId);
+  const defendingUnit = state.units.get(defendingUnitId);
+
+  if (!attackingUnit || !defendingUnit) {
+    throw new Error("Unit not found!");
+  }
 
   const updatedUnits = attackUnit(
     state.units,
@@ -90,7 +94,7 @@ export function attackReducer(
     defendingUnitId
   );
 
-  const isKilled = updatedUnits[defendingUnitId] === undefined;
+  const isKilled = updatedUnits.get(defendingUnitId) === undefined;
   const isKingKilled = isKing(defendingUnit) && isKilled;
 
   const updatedOutcome = isKingKilled
