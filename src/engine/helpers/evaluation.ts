@@ -8,7 +8,7 @@ import type { GameState } from "@/types/game";
 import type { PlayerId } from "@/types/id";
 import type { UnitType, Unit } from "@/types/unit";
 
-export type GameStateEvaluation = Record<PlayerId, number>;
+export type GameStateEvaluation = number[];
 
 export const unitValue: Record<UnitType, number> = {
   mindBender: 1000,
@@ -28,12 +28,14 @@ export const evaluateUnit = (unit: Unit): number => {
 };
 
 export const getStateEvaluation = (state: GameState): GameStateEvaluation => {
-  const { units, players } = state;
+  const { units, players, outcome } = state;
+  const scores: GameStateEvaluation = new Array<number>(players.length);
 
-  const scores: GameStateEvaluation = {};
-  Object.values(players).forEach((player) => {
-    scores[player.id] = 0;
-  });
+  if (outcome.status === "finished") {
+    scores.fill(-Infinity);
+    scores[outcome.winnerId] = Infinity;
+    return scores;
+  }
 
   units.forEach((unit) => {
     scores[unit.ownerId] += evaluateUnit(unit);
@@ -46,20 +48,8 @@ export const getPlayerScore = (
   state: GameState,
   playerId: PlayerId
 ): number => {
-  const { players, outcome } = state;
-  if (outcome.status === "finished") {
-    return outcome.winnerId === playerId ? Infinity : -Infinity;
-  }
-
   const scores = getStateEvaluation(state);
-  let playerScore = 0;
-
-  Object.values(players).forEach((player) => {
-    playerScore +=
-      player.id === playerId ? scores[player.id] : -scores[player.id];
-  });
-
-  return playerScore;
+  return scores[playerId];
 };
 
 export const evaluatePlayerAction = (
@@ -67,17 +57,13 @@ export const evaluatePlayerAction = (
   action: UnitAction,
   playerId: PlayerId
 ): number => {
-  const { players } = state;
-
   const newState = gameEngine(state, action);
   const scores = getStateEvaluation(newState);
 
-  let actionScore = 0;
+  const totalScore = scores.reduce(
+    (accumulator, currentValue) => accumulator + currentValue,
+    0
+  );
 
-  Object.values(players).forEach((player) => {
-    actionScore +=
-      player.id === playerId ? scores[player.id] : -scores[player.id];
-  });
-
-  return actionScore;
+  return totalScore - 2 * scores[playerId];
 };

@@ -15,30 +15,34 @@ import { isKing, schemaVersion } from "@/engine/common";
 import { getOccupantIdAt } from "../helpers/map";
 
 // utils
-import { createBrandedId } from "@/utils/common.util";
+import { shuffleArray } from "@/utils/common.util";
 
 // data
 import { defaultGameConfig } from "@/data/defaultGameConfig";
 
 // types
-import type { GameState, Players } from "@/types/game";
+import type { GameState } from "@/types/game";
 import type { GameConfig } from "@/types/gameConfig";
 import type { UnitActionPayload } from "@/types/action";
+import type { PlayerId } from "@/types/id";
 
 export function createReducer(
   config: GameConfig = defaultGameConfig
 ): GameState {
   const { playerTypes } = config;
-  const playerA = createBrandedId("player");
-  const playerB = createBrandedId("player");
+  const playerA: PlayerId = 0;
+  const playerB: PlayerId = 1;
 
   const units = createUnits(playerA, playerB);
 
-  const players: Players = {
-    [playerA]: { id: playerA, name: "A", type: playerTypes[0] },
-    [playerB]: { id: playerB, name: "B", type: playerTypes[1] },
-  };
-  const updatedTurn = getInitialTurn(players);
+  const playerOrder = shuffleArray([
+    { name: "A", type: playerTypes[0] },
+    { name: "B", type: playerTypes[1] },
+  ]);
+  const players = playerOrder.map((player, id) => {
+    return { id, ...player };
+  });
+  const updatedTurn = getInitialTurn();
 
   return {
     schemaVersion: schemaVersion,
@@ -125,7 +129,7 @@ export function resignReducer(state: GameState): GameState {
 }
 
 export function advanceReducer(state: GameState): GameState {
-  const updatedTurn = advanceTurn(state.turn);
+  const updatedTurn = advanceTurn(state.turn, state.players);
 
   return {
     ...state,

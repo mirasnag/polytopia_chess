@@ -1,3 +1,3 @@
 export type GameId = `game-${string}`;
-export type PlayerId = `player-${string}`;
+export type PlayerId = number;
 export type UnitId = `unit-${string}`;

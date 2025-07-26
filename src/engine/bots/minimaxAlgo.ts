@@ -20,7 +20,9 @@ export const minimaxBotAlgo = (
   state: GameState,
   turnDepth: number = 1
 ): TurnActions => {
-  const { currentPlayerId, playerOrder } = state.turn;
+  const currentPlayerId = state.turn.currentPlayerId;
+  const playerOrder = state.players;
+
   const playerCnt = playerOrder.length;
   const depth = playerCnt * turnDepth;
 

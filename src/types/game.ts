@@ -14,12 +14,10 @@ export interface PlayerInGame {
   type: PlayerType;
 }
 
-export type Players = Record<PlayerId, PlayerInGame>;
+export type Players = PlayerInGame[];
 
 export interface Turn {
   counter: number;
-  playerOrder: PlayerId[];
-  orderIndex: number;
   currentPlayerId: PlayerId;
 
   actingUnitId: UnitId | null;

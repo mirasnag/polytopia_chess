@@ -4,7 +4,7 @@ export function createBrandedId<K extends string>(prefix: K): `${K}-${string}` {
 }
 
 // Fisher-Yates Shuffle
-export function shuffleArray(array: any[]) {
+export function shuffleArray<T extends any>(array: T[]): T[] {
   let currentIndex = array.length,
     randomIndex;
 
