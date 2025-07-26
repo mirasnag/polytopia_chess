@@ -13,6 +13,12 @@ import {
 import { kingCaptureOutcome, resignOutcome } from "@/engine/reducers/outcome";
 import { isKing, schemaVersion } from "@/engine/common";
 import { getOccupantIdAt } from "../helpers/map";
+import {
+  computeZobristKey,
+  createZobristTable,
+  updateZobristKeyAdvanceTurn,
+  updateZobristKeyUnits,
+} from "../helpers/zobrist";
 
 // utils
 import { shuffleArray } from "@/utils/common.util";
@@ -21,10 +27,12 @@ import { shuffleArray } from "@/utils/common.util";
 import { defaultGameConfig } from "@/data/defaultGameConfig";
 
 // types
-import type { GameState } from "@/types/game";
+import type { GameOutcome, GameState } from "@/types/game";
 import type { GameConfig } from "@/types/gameConfig";
 import type { UnitActionPayload } from "@/types/action";
 import type { PlayerId } from "@/types/id";
+import type { MapGrid } from "@/types/tile";
+import type { Units } from "@/types/unit";
 
 export function createReducer(
   config: GameConfig = defaultGameConfig
@@ -33,7 +41,14 @@ export function createReducer(
   const playerA: PlayerId = 0;
   const playerB: PlayerId = 1;
 
-  const units = createUnits(playerA, playerB);
+  const map: MapGrid = {
+    width: 8,
+    height: 8,
+  };
+
+  const outcome: GameOutcome = { status: "ongoing" };
+
+  const units: Units = createUnits(playerA, playerB);
 
   const playerOrder = shuffleArray([
     { name: "A", type: playerTypes[0] },
@@ -42,19 +57,21 @@ export function createReducer(
   const players = playerOrder.map((player, id) => {
     return { id, ...player };
   });
-  const updatedTurn = getInitialTurn();
+  const turn = getInitialTurn();
+
+  const zTable = createZobristTable();
+  const zKey = computeZobristKey(zTable, units);
 
   return {
-    schemaVersion: schemaVersion,
-    players: players,
-    units: units,
-    map: {
-      width: 8,
-      height: 8,
-    },
-    turn: updatedTurn,
-    outcome: { status: "ongoing" },
-    config: config,
+    schemaVersion,
+    players,
+    units,
+    map,
+    turn,
+    outcome,
+    config,
+    zTable,
+    zKey,
   };
 }
 
@@ -66,11 +83,18 @@ export function moveReducer(
 
   const updatedUnits = moveUnit(state.units, unitId, newPos);
   const updatedTurn = registerUnitAction(state.turn, { type: "move", payload });
+  const updatedZKey = updateZobristKeyUnits(
+    state.zKey,
+    state.zTable,
+    [state.units.get(unitId)],
+    [updatedUnits.get(unitId)]
+  );
 
   return {
     ...state,
     units: updatedUnits,
     turn: updatedTurn,
+    zKey: updatedZKey,
   };
 }
 
@@ -110,11 +134,19 @@ export function attackReducer(
     payload,
   });
 
+  const updatedZKey = updateZobristKeyUnits(
+    state.zKey,
+    state.zTable,
+    [state.units.get(attackingUnitId), state.units.get(defendingUnitId)],
+    [updatedUnits.get(attackingUnitId), updatedUnits.get(defendingUnitId)]
+  );
+
   return {
     ...state,
     units: updatedUnits,
     turn: updatedTurn,
     outcome: updatedOutcome,
+    zKey: updatedZKey,
   };
 }
 
@@ -130,9 +162,11 @@ export function resignReducer(state: GameState): GameState {
 
 export function advanceReducer(state: GameState): GameState {
   const updatedTurn = advanceTurn(state.turn, state.players);
+  const updatedZKey = updateZobristKeyAdvanceTurn(state.zKey, state.zTable);
 
   return {
     ...state,
     turn: updatedTurn,
+    zKey: updatedZKey,
   };
 }

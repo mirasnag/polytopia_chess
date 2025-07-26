@@ -5,6 +5,7 @@ import { Map as IMap } from "immutable";
 import type { GameState } from "@/types/game";
 import type { UnitId } from "@/types/id";
 import { UnitRecord, type Unit } from "@/types/unit";
+import { serializeBigIntData } from "@/utils/bigint.util";
 
 const STORAGE_KEY = "gameState";
 
@@ -29,7 +30,7 @@ export const gameManager = {
   },
 
   save(state: GameState) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    localStorage.setItem(STORAGE_KEY, serializeBigIntData(state));
   },
 
   clear() {

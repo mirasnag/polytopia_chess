@@ -32,6 +32,9 @@ export type GameOutcome =
       reason: "resign" | "kingCaptured";
     };
 
+export type ZobristTable = BigInt64Array;
+export type ZobristKey = bigint;
+
 export interface GameState {
   schemaVersion: {
     major: number;
@@ -43,4 +46,6 @@ export interface GameState {
   turn: Turn;
   outcome: GameOutcome;
   config: GameConfig;
+  zKey: ZobristKey;
+  zTable: ZobristTable;
 }

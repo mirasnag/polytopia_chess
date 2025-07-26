@@ -29,7 +29,7 @@ export const evaluateUnit = (unit: Unit): number => {
 
 export const getStateEvaluation = (state: GameState): GameStateEvaluation => {
   const { units, players, outcome } = state;
-  const scores: GameStateEvaluation = new Array<number>(players.length);
+  const scores: GameStateEvaluation = new Array<number>(players.length, 0);
 
   if (outcome.status === "finished") {
     scores.fill(-Infinity);
