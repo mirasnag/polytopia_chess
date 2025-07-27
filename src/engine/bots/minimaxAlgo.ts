@@ -1,5 +1,5 @@
 import type { GameAction, TurnActions } from "@/types/action";
-import type { GameState } from "@/types/game";
+import type { ZobristKey, GameState } from "@/types/game";
 import { getChildNodes } from "../helpers/gameTree";
 import { getPlayerScore } from "../helpers/evaluation";
 import type { PlayerId } from "@/types/id";
@@ -12,6 +12,12 @@ interface MinimaxReturn {
 }
 
 const advanceAction: GameAction = { type: "advance", payload: {} };
+
+// transposition table of states
+const tt = new Map<
+  ZobristKey,
+  { score: number; actions: TurnActions[]; depth: number }
+>();
 
 let start = performance.now();
 const maxSearchTime = 3000; // milliseconds
@@ -29,7 +35,6 @@ export const minimaxBotAlgo = (
   start = performance.now();
   const { actions } = minimax(state, depth, currentPlayerId);
   const randomBestAction = getRandomArrayEntry(actions);
-
   return randomBestAction ?? [];
 };
 
@@ -40,6 +45,12 @@ export const minimax = (
   alpha = -Infinity,
   beta = Infinity
 ): MinimaxReturn => {
+  const key = state.zKey;
+  const entry = tt.get(key);
+  if (entry && entry.depth >= depth) {
+    return { score: entry.score, actions: entry.actions };
+  }
+
   if (performance.now() - start > maxSearchTime) {
     return { score: getPlayerScore(state, mainPlayerId), actions: [] };
   }
@@ -79,6 +90,8 @@ export const minimax = (
       if (beta <= alpha) break;
     }
 
+    tt.set(key, { score: bestScore, actions: bestActions, depth });
+
     return {
       score: bestScore,
       actions: bestActions,
@@ -106,6 +119,8 @@ export const minimax = (
       beta = Math.min(beta, worstScore);
       if (beta <= alpha) break;
     }
+
+    tt.set(key, { score: worstScore, actions: worstActions, depth });
 
     return {
       score: worstScore,

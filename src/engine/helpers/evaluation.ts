@@ -4,7 +4,7 @@ import { gameEngine } from "../core";
 
 // types
 import type { UnitAction } from "@/types/action";
-import type { GameState } from "@/types/game";
+import type { ZobristKey, GameState } from "@/types/game";
 import type { PlayerId } from "@/types/id";
 import type { UnitType, Unit } from "@/types/unit";
 
@@ -27,7 +27,13 @@ export const evaluateUnit = (unit: Unit): number => {
   return Math.round(maxValue * (unit.stats.hp / totalHp));
 };
 
+// tranposition table for state evaluations
+const tt = new Map<ZobristKey, GameStateEvaluation>();
+
 export const getStateEvaluation = (state: GameState): GameStateEvaluation => {
+  const entry = tt.get(state.zKey);
+  if (entry) return entry;
+
   const { units, players, outcome } = state;
   const scores: GameStateEvaluation = new Array<number>(players.length, 0);
 
@@ -41,6 +47,7 @@ export const getStateEvaluation = (state: GameState): GameStateEvaluation => {
     scores[unit.ownerId] += evaluateUnit(unit);
   });
 
+  tt.set(state.zKey, scores);
   return scores;
 };
 
