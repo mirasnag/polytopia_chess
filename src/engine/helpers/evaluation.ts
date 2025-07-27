@@ -1,3 +1,6 @@
+// library imports
+import { LRUCache } from "lru-cache";
+
 // helpers
 import { getUnitBaseStats } from "@/data/unitBaseStats";
 import { gameEngine } from "../core";
@@ -28,7 +31,9 @@ export const evaluateUnit = (unit: Unit): number => {
 };
 
 // tranposition table for state evaluations
-const tt = new Map<ZobristKey, GameStateEvaluation>();
+const tt = new LRUCache<ZobristKey, GameStateEvaluation>({
+  max: 20000,
+});
 
 export const getStateEvaluation = (state: GameState): GameStateEvaluation => {
   const entry = tt.get(state.zKey);
