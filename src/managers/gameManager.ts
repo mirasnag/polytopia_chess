@@ -1,11 +1,12 @@
 // library imports
-import { Map as IMap } from "immutable";
+import { Map as IMap, List } from "immutable";
 
 // types
 import type { GameState } from "@/types/game";
 import type { UnitId } from "@/types/id";
 import { UnitRecord, type Unit } from "@/types/unit";
 import { serializeBigIntData } from "@/utils/bigint.util";
+import type { Tile } from "@/types/tile";
 
 const STORAGE_KEY = "gameState";
 
@@ -15,13 +16,18 @@ export const gameManager = {
     if (!raw) return null;
     try {
       const objState = JSON.parse(raw);
-      const unitsArr = Object.values(objState.units) as Unit[];
+      const unitsRaw = Object.values(objState.units) as Unit[];
+      const tilesRaw = objState.map.tiles as Tile[][];
 
       return {
         ...objState,
         units: IMap<UnitId, UnitRecord>(
-          unitsArr.map((value) => [value.id, new UnitRecord(value)])
+          unitsRaw.map((value) => [value.id, new UnitRecord(value)])
         ),
+        map: {
+          ...objState.map,
+          tiles: List<List<Tile>>(tilesRaw.map((row) => List<Tile>(row))),
+        },
       };
     } catch {
       console.warn("Invalid game state in storage");

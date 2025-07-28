@@ -6,9 +6,6 @@ import type { GameState, Turn } from "@/types/game";
 import type { Tile } from "@/types/tile";
 import type { Unit } from "@/types/unit";
 
-// helpers
-import { getMapTiles } from "./map";
-
 export function canMove(unit: Unit, turn: Turn): boolean {
   const { actions, actingUnitId } = turn;
 
@@ -36,9 +33,7 @@ export function getValidMoves(state: GameState, unit: Unit): Set<Tile> {
 
   const { movement } = getUnitBaseStats(unit.type);
   const { x, y } = unit.position;
-  const { width, height } = state.map;
-
-  const tiles = getMapTiles(state);
+  const { width, height, tiles } = state.map;
 
   const minX = Math.max(0, x - movement);
   const maxX = Math.min(width - 1, x + movement);
@@ -47,8 +42,9 @@ export function getValidMoves(state: GameState, unit: Unit): Set<Tile> {
 
   for (let nx = minX; nx <= maxX; nx++) {
     for (let ny = minY; ny <= maxY; ny++) {
-      if (!tiles[ny][nx].occupantId) {
-        validMoves.add(tiles[ny][nx]);
+      const tile = tiles.getIn([ny, nx]) as Tile;
+      if (!tile.occupantId) {
+        validMoves.add(tile);
       }
     }
   }

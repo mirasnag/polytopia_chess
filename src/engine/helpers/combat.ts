@@ -6,9 +6,6 @@ import type { GameState, Turn } from "@/types/game";
 import type { Tile } from "@/types/tile";
 import type { Unit } from "@/types/unit";
 
-// helpers
-import { getMapTiles } from "./map";
-
 const baseDamage = 5;
 
 export function calculateDamage(
@@ -56,9 +53,7 @@ export function getValidAttacks(state: GameState, unit: Unit): Set<Tile> {
 
   const { range } = getUnitBaseStats(unit.type);
   const { x, y } = unit.position;
-  const { width, height } = state.map;
-
-  const tiles = getMapTiles(state);
+  const { width, height, tiles } = state.map;
   const units = state.units;
 
   const minX = Math.max(0, x - range);
@@ -68,11 +63,12 @@ export function getValidAttacks(state: GameState, unit: Unit): Set<Tile> {
 
   for (let nx = minX; nx <= maxX; nx++) {
     for (let ny = minY; ny <= maxY; ny++) {
-      const anotherUnitId = tiles[ny][nx].occupantId;
+      const tile = tiles.getIn([ny, nx]) as Tile;
+      const anotherUnitId = tile.occupantId;
       if (!anotherUnitId) continue;
 
       if (units.get(anotherUnitId)?.ownerId !== unit.ownerId) {
-        validAttacks.add(tiles[ny][nx]);
+        validAttacks.add(tile);
       }
     }
   }
