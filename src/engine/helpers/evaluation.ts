@@ -40,7 +40,7 @@ export const getStateEvaluation = (state: GameState): GameStateEvaluation => {
   if (entry) return entry;
 
   const { units, players, outcome } = state;
-  const scores: GameStateEvaluation = new Array<number>(players.length, 0);
+  const scores: GameStateEvaluation = new Array<number>(players.length).fill(0);
 
   if (outcome.status === "finished") {
     scores.fill(-Infinity);
@@ -61,7 +61,16 @@ export const getPlayerScore = (
   playerId: PlayerId
 ): number => {
   const scores = getStateEvaluation(state);
-  return scores[playerId];
+  if (state.outcome.status === "finished") {
+    return scores[playerId];
+  }
+
+  const totalScore = scores.reduce(
+    (accumulator, currentValue) => accumulator + currentValue,
+    0
+  );
+
+  return 2 * scores[playerId] - totalScore;
 };
 
 export const evaluatePlayerAction = (
@@ -72,10 +81,14 @@ export const evaluatePlayerAction = (
   const newState = gameEngine(state, action);
   const scores = getStateEvaluation(newState);
 
+  if (state.outcome.status === "finished") {
+    return scores[playerId];
+  }
+
   const totalScore = scores.reduce(
     (accumulator, currentValue) => accumulator + currentValue,
     0
   );
 
-  return totalScore - 2 * scores[playerId];
+  return 2 * scores[playerId] - totalScore;
 };

@@ -1,10 +1,13 @@
-import type { GameAction, TurnActions } from "@/types/action";
-import type { GameState } from "@/types/game";
-import { getChildNodes } from "../helpers/gameTree";
-import { getPlayerScore } from "../helpers/evaluation";
-import type { PlayerId } from "@/types/id";
-import { getRandomArrayEntry } from "@/utils/common.util";
+// helpers
 import { gameEngine } from "../core";
+import { ChildGenerator } from "../helpers/gameTree";
+import { getPlayerScore } from "../helpers/evaluation";
+import { getRandomArrayEntry } from "@/utils/common.util";
+
+// types
+import type { GameState } from "@/types/game";
+import type { GameAction, TurnActions } from "@/types/action";
+import type { PlayerId } from "@/types/id";
 
 interface MinimaxReturn {
   score: number;
@@ -44,21 +47,21 @@ export const minimax = (
   }
 
   const { outcome, turn } = state;
-  const isFinished = outcome.status === "finished";
 
-  if (depth === 0 || isFinished) {
+  if (depth === 0 || outcome.status === "finished") {
     return { score: getPlayerScore(state, mainPlayerId), actions: [] };
   }
 
   const isMainPlayer = turn.currentPlayerId === mainPlayerId;
-  const childStates = getChildNodes(state);
-  childStates.sort(stateComp);
+  const gen = new ChildGenerator(state);
+  let childState: GameState | null = gen.next();
+  let res: MinimaxReturn;
 
   if (isMainPlayer) {
     let bestScore = -Infinity;
     let bestActions: TurnActions[] = [];
 
-    for (const childState of childStates) {
+    while (childState) {
       const { score: childScore } = minimax(
         gameEngine(childState, advanceAction),
         depth - 1,
@@ -76,9 +79,11 @@ export const minimax = (
 
       alpha = Math.max(alpha, bestScore);
       if (beta <= alpha) break;
+
+      childState = gen.next();
     }
 
-    return {
+    res = {
       score: bestScore,
       actions: bestActions,
     };
@@ -86,7 +91,7 @@ export const minimax = (
     let worstScore = Infinity;
     let worstActions: TurnActions[] = [];
 
-    for (const childState of childStates) {
+    while (childState) {
       const { score: childScore } = minimax(
         gameEngine(childState, advanceAction),
         depth - 1,
@@ -104,29 +109,15 @@ export const minimax = (
 
       beta = Math.min(beta, worstScore);
       if (beta <= alpha) break;
+
+      childState = gen.next();
     }
 
-    return {
+    res = {
       score: worstScore,
       actions: worstActions,
     };
   }
+
+  return res;
 };
-
-function stateComp(a: GameState, b: GameState): number {
-  if (a.outcome.status === "finished") return -1;
-  if (b.outcome.status === "finished") return 1;
-
-  let score = 0;
-  a.turn.actions.forEach((action) => {
-    if (action.type === "kill") score -= 5;
-    if (action.type === "attack") score -= 1;
-  });
-
-  b.turn.actions.forEach((action) => {
-    if (action.type === "kill") score += 5;
-    if (action.type === "attack") score += 1;
-  });
-
-  return score;
-}
