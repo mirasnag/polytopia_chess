@@ -6,17 +6,20 @@ import type { Dispatch, ReactNode } from "react";
 import type { GameState, PlayerInGame } from "@/types/game";
 import type { GameAction } from "@/types/action";
 import type { Units } from "@/types/unit";
+import type { Tile } from "@/types/tile";
 
 // helpers
 import { createReducer } from "@/engine/reducers/index";
 import { gameEngine } from "@/engine/core";
 import { gameManager } from "@/managers/gameManager";
+import { getMapTiles } from "@/engine/helpers/map";
 
 export const GameContext = createContext<{
   state: GameState;
   units: Units;
-  tiles: GameState["map"]["tiles"];
   turn: GameState["turn"];
+  map: GameState["map"];
+  tiles: Tile[][];
   players: GameState["players"];
   outcome: GameState["outcome"];
   config: GameState["config"];
@@ -47,7 +50,8 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     state: state,
     dispatch: dispatch,
     units: state.units,
-    tiles: state.map.tiles,
+    map: state.map,
+    tiles: getMapTiles(state.map),
     turn: state.turn,
     outcome: state.outcome,
     players: state.players,

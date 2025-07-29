@@ -1,33 +1,28 @@
-import type { GameState } from "@/types/game";
-import type { UnitId } from "@/types/id";
-import type { Tile } from "@/types/tile";
-import type { Units } from "@/types/unit";
+import type { MapGrid, Tile, TileKey } from "@/types/tile";
 
-type Occupant = UnitId | null;
-
-export function getOccupantIdAt(x: number, y: number, units: Units): Occupant {
-  for (const unit of units.values()) {
-    if (unit.position.x === x && unit.position.y === y) return unit.id;
-  }
-
-  return null;
+export function keyToTile(key: TileKey): Tile {
+  const [y, x] = key.split(",");
+  return {
+    x: parseInt(x),
+    y: parseInt(y),
+  };
 }
 
-export function getMapTiles(state: GameState): Tile[][] {
-  const { units, map } = state;
-  const { width, height } = map;
+export function getMapTiles(map: MapGrid): Tile[][] {
+  const { width, height, occupancy } = map;
 
   const tiles: Tile[][] = [];
   for (let y = 0; y < height; y++) {
     const row: Tile[] = [];
     for (let x = 0; x < width; x++) {
-      row.push({ x, y });
+      row.push({ y, x });
     }
     tiles.push(row);
   }
 
-  for (const unit of units.values()) {
-    tiles[unit.position.y][unit.position.x].occupantId = unit.id;
+  for (const [tileKey, unitId] of occupancy.entries()) {
+    const tile = keyToTile(tileKey);
+    tiles[tile.y][tile.x].occupantId = unitId;
   }
 
   return tiles;

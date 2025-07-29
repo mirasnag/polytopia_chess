@@ -1,12 +1,14 @@
 // library imports
-import { Map as IMap, List } from "immutable";
+import { Map as IMap } from "immutable";
 
 // types
 import type { GameState } from "@/types/game";
 import type { UnitId } from "@/types/id";
+import type { TileKey } from "@/types/tile";
 import { UnitRecord, type Unit } from "@/types/unit";
+
+// utils
 import { serializeBigIntData } from "@/utils/bigint.util";
-import type { Tile } from "@/types/tile";
 
 const STORAGE_KEY = "gameState";
 
@@ -17,7 +19,7 @@ export const gameManager = {
     try {
       const objState = JSON.parse(raw);
       const unitsRaw = Object.values(objState.units) as Unit[];
-      const tilesRaw = objState.map.tiles as Tile[][];
+      const occupancyRaw = objState.map.occupancy as [TileKey, UnitId][];
 
       return {
         ...objState,
@@ -26,7 +28,7 @@ export const gameManager = {
         ),
         map: {
           ...objState.map,
-          tiles: List<List<Tile>>(tilesRaw.map((row) => List<Tile>(row))),
+          occupancy: IMap(occupancyRaw),
         },
       };
     } catch {

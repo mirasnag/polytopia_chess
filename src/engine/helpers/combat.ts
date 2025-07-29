@@ -53,7 +53,7 @@ export function getValidAttacks(state: GameState, unit: Unit): Set<Tile> {
 
   const { range } = getUnitBaseStats(unit.type);
   const { x, y } = unit.position;
-  const { width, height, tiles } = state.map;
+  const { width, height, occupancy } = state.map;
   const units = state.units;
 
   const minX = Math.max(0, x - range);
@@ -63,12 +63,11 @@ export function getValidAttacks(state: GameState, unit: Unit): Set<Tile> {
 
   for (let nx = minX; nx <= maxX; nx++) {
     for (let ny = minY; ny <= maxY; ny++) {
-      const tile = tiles.getIn([ny, nx]) as Tile;
-      const anotherUnitId = tile.occupantId;
+      const anotherUnitId = occupancy.get(`${ny},${nx}`);
       if (!anotherUnitId) continue;
 
       if (units.get(anotherUnitId)?.ownerId !== unit.ownerId) {
-        validAttacks.add(tile);
+        validAttacks.add({ x: nx, y: ny });
       }
     }
   }

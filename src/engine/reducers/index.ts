@@ -19,8 +19,6 @@ import {
   updateZobristKeyUnits,
 } from "../helpers/zobrist";
 import {
-  applyUnitsToMap,
-  copyTiles,
   createMap,
   moveTileOccupant,
   removeTileOccupant,
@@ -34,7 +32,7 @@ import { defaultGameConfig } from "@/data/defaultGameConfig";
 import type { GameOutcome, GameState } from "@/types/game";
 import type { GameConfig } from "@/types/gameConfig";
 import type { UnitActionPayload } from "@/types/action";
-import type { PlayerId, UnitId } from "@/types/id";
+import type { PlayerId } from "@/types/id";
 import type { MapGrid } from "@/types/tile";
 import type { Units } from "@/types/unit";
 
@@ -55,7 +53,7 @@ export function createReducer(
   });
 
   const units: Units = createUnits(playerA, playerB);
-  const map: MapGrid = applyUnitsToMap(createMap(), units);
+  const map: MapGrid = createMap(8, 8, units);
 
   const outcome: GameOutcome = { status: "ongoing" };
   const turn = getInitialTurn();
@@ -88,7 +86,7 @@ export function moveReducer(
   }
 
   const updatedUnits = moveUnit(state.units, unitId, newPos);
-  const updatedTiles = moveTileOccupant(state.map.tiles, unit.position, newPos);
+  const updatedMap = moveTileOccupant(state.map, unit.position, newPos);
   const updatedTurn = registerUnitAction(state.turn, { type: "move", payload });
   const updatedZKey = updateZobristKeyUnits(
     state.zKey,
@@ -100,10 +98,7 @@ export function moveReducer(
   return {
     ...state,
     units: updatedUnits,
-    map: {
-      ...state.map,
-      tiles: updatedTiles,
-    },
+    map: updatedMap,
     turn: updatedTurn,
     zKey: updatedZKey,
   };
@@ -114,11 +109,7 @@ export function attackReducer(
   payload: UnitActionPayload
 ): GameState {
   const { unitId: attackingUnitId, to } = payload;
-  const defendingUnitId = state.map.tiles.getIn([
-    to.y,
-    to.x,
-    "occupantId",
-  ]) as UnitId;
+  const defendingUnitId = state.map.occupancy.get(`${to.y},${to.x}`);
 
   if (!defendingUnitId) {
     throw new Error("Attacked tile has no unit");
@@ -140,15 +131,17 @@ export function attackReducer(
   const isKilled = updatedUnits.get(defendingUnitId) === undefined;
   const isKingKilled = isKing(defendingUnit) && isKilled;
 
-  const updatedTiles = isKilled
+  const updatedMap = isKilled
     ? attackingUnit.stats.range === 1
       ? replaceTileOccupant(
-          state.map.tiles,
+          state.map,
           attackingUnit.position,
           defendingUnit.position
         )
-      : removeTileOccupant(state.map.tiles, defendingUnit.position)
-    : copyTiles(state.map.tiles);
+      : removeTileOccupant(state.map, defendingUnit.position)
+    : {
+        ...state.map,
+      };
 
   const updatedOutcome = isKingKilled
     ? kingCaptureOutcome(attackingUnit.ownerId)
@@ -169,10 +162,7 @@ export function attackReducer(
   return {
     ...state,
     units: updatedUnits,
-    map: {
-      ...state.map,
-      tiles: updatedTiles,
-    },
+    map: updatedMap,
     turn: updatedTurn,
     outcome: updatedOutcome,
     zKey: updatedZKey,

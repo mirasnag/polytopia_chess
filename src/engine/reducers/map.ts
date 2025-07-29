@@ -1,67 +1,62 @@
+// library imports
+import { Map as IMap } from "immutable";
+
 // types
 import type { Units } from "@/types/unit";
-import type { MapGrid, Tile, Tiles } from "@/types/tile";
-import { List } from "immutable";
+import type { MapGrid, TileKey } from "@/types/tile";
+import type { UnitId } from "@/types/id";
 
-export function createMap(width: number = 8, height: number = 8): MapGrid {
-  let tiles: Tiles = List(List([]));
-  for (let y = 0; y < height; y++) {
-    let row: List<Tile> = List([]);
-    for (let x = 0; x < width; x++) {
-      row = row.withMutations((row) => {
-        row.push({ x, y });
-      });
-    }
-    tiles = tiles.withMutations((tiles) => {
-      tiles.push(row);
-    });
-  }
+export function createMap(
+  width: number = 8,
+  height: number = 8,
+  units?: Units
+): MapGrid {
+  const occupancy =
+    units?.mapEntries<TileKey, UnitId>(([unitId, unit]) => {
+      return [`${unit.position.y},${unit.position.x}`, unitId];
+    }) ?? IMap();
 
-  return { width, height, tiles };
-}
-
-export function copyTiles(tiles: Tiles): Tiles {
-  return tiles.slice();
-}
-
-export function applyUnitsToMap(map: MapGrid, units: Units): MapGrid {
-  const tiles = map.tiles.withMutations((tiles) => {
-    units.forEach((unit) => {
-      tiles.setIn([unit.position.y, unit.position.x, "occupantId"], unit.id);
-    });
-  });
-  return { ...map, tiles };
+  return { width, height, occupancy };
 }
 
 export function moveTileOccupant(
-  tiles: Tiles,
+  map: MapGrid,
   from: { x: number; y: number },
   to: { x: number; y: number }
-): Tiles {
-  return tiles.withMutations((tiles) => {
-    const occupantId = tiles.getIn([from.y, from.x, "occupantId"]);
-    tiles.setIn([to.y, to.x, "occupantId"], occupantId);
-    tiles.deleteIn([from.y, from.x, "occupantId"]);
-  });
+): MapGrid {
+  const keyFrom = `${from.y},${from.x}` as TileKey;
+  const keyTo = `${to.y},${to.x}` as TileKey;
+  const unitId = map.occupancy.get(keyFrom)!;
+
+  return {
+    ...map,
+    occupancy: map.occupancy.delete(keyFrom).set(keyTo, unitId),
+  };
 }
 
 export function removeTileOccupant(
-  tiles: Tiles,
+  map: MapGrid,
   pos: { x: number; y: number }
-): Tiles {
-  return tiles.withMutations((tiles) => {
-    tiles.deleteIn([pos.y, pos.x, "occupantId"]);
-  });
+): MapGrid {
+  const key = `${pos.y},${pos.x}` as TileKey;
+
+  return {
+    ...map,
+    occupancy: map.occupancy.delete(key),
+  };
 }
 
 export function replaceTileOccupant(
-  tiles: Tiles,
+  map: MapGrid,
   from: { x: number; y: number },
   to: { x: number; y: number }
-): Tiles {
-  return tiles.withMutations((tiles) => {
-    const occupantId = tiles.getIn([from.y, from.x, "occupantId"]);
-    tiles.setIn([to.y, to.x, "occupantId"], occupantId);
-    tiles.deleteIn([from.y, from.x, "occupantId"]);
-  });
+): MapGrid {
+  const keyFrom = `${from.y},${from.x}` as TileKey;
+  const keyTo = `${to.y},${to.x}` as TileKey;
+  const unitId = map.occupancy.get(keyFrom)!;
+
+  return {
+    ...map,
+    occupancy: map.occupancy.delete(keyFrom).set(keyTo, unitId),
+  };
 }
