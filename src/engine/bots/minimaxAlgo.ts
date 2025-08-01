@@ -30,9 +30,44 @@ export const minimaxBotAlgo = (
   const depth = playerCnt * turnDepth;
 
   start = performance.now();
-  const { actions } = minimax(state, depth, currentPlayerId);
+  const { actions } = minimaxIterativeDeepening(state, depth, currentPlayerId);
+
   const randomBestAction = getRandomArrayEntry(actions);
   return randomBestAction ?? [];
+};
+
+// minimax with iterative deepening
+export const minimaxIterativeDeepening = (
+  state: GameState,
+  depth: number,
+  mainPlayerId: PlayerId
+): MinimaxReturn => {
+  let alpha = -Infinity;
+  let beta = Infinity;
+  const delta = 10;
+  let bestActions: TurnActions[] = [];
+  let bestScore: number = 0;
+
+  for (let curDepth = 1; curDepth <= depth; curDepth++) {
+    let { score, actions } = minimax(
+      state,
+      curDepth,
+      mainPlayerId,
+      alpha,
+      beta
+    );
+    if (score <= alpha || score >= beta) {
+      ({ score, actions } = minimax(state, curDepth, mainPlayerId));
+    }
+
+    alpha = score - delta;
+    beta = score + delta;
+
+    bestActions = actions;
+    bestScore = score;
+  }
+
+  return { score: bestScore, actions: bestActions };
 };
 
 export const minimax = (
