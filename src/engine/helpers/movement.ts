@@ -97,11 +97,15 @@ export function bfs(grid: MapGrid, units: Units, unit: Unit): Set<Tile> {
 export function bfsShort(grid: MapGrid, unit: Unit): Set<Tile> {
   const valid = new Set<Tile>();
   const { x: sx, y: sy } = unit.position;
-  const { occupancy } = grid;
+  const { width, height, occupancy } = grid;
 
   for (const [dx, dy] of DIRS) {
-    const key = `${sy + dy},${sx + dx}` as TileKey;
-    if (!occupancy.has(key)) valid.add({ x: sx + dx, y: sy + dy });
+    const x = sx + dx;
+    const y = sy + dy;
+    if (x < 0 || x >= width || y < 0 || y >= height) continue;
+
+    const key = `${y},${x}` as TileKey;
+    if (!occupancy.has(key)) valid.add({ x, y });
   }
 
   return valid;
