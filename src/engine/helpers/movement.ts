@@ -1,10 +1,10 @@
 // data
-import { getUnitBaseStats, getUnitTraits } from "@/data/unitBaseStats";
+import { getUnitTraits } from "@/data/unitBaseStats";
 
 // types
 import type { GameState, Turn } from "@/types/game";
-import type { Tile } from "@/types/tile";
-import type { Unit } from "@/types/unit";
+import type { MapGrid, Tile, TileKey } from "@/types/tile";
+import type { Unit, Units } from "@/types/unit";
 
 export function canMove(unit: Unit, turn: Turn): boolean {
   const { actions, actingUnitId } = turn;
@@ -25,30 +25,86 @@ export function canMove(unit: Unit, turn: Turn): boolean {
 }
 
 export function getValidMoves(state: GameState, unit: Unit): Set<Tile> {
-  const validMoves = new Set<Tile>();
+  if (state.outcome.status === "finished" || !canMove(unit, state.turn))
+    return new Set<Tile>();
+  return bfs(state.map, state.units, unit);
+}
 
-  if (state.outcome.status === "finished") return validMoves;
+const DIRS: [number, number][] = [
+  [1, 1],
+  [1, 0],
+  [1, -1],
+  [0, 1],
+  [0, -1],
+  [-1, 1],
+  [-1, 0],
+  [-1, -1],
+];
 
-  if (!canMove(unit, state.turn)) return validMoves;
+export function bfs(grid: MapGrid, units: Units, unit: Unit): Set<Tile> {
+  const movement = unit.stats.movement;
+  if (movement === 1) return bfsShort(grid, unit);
 
-  const { movement } = getUnitBaseStats(unit.type);
-  const { x, y } = unit.position;
-  const { width, height, occupancy } = state.map;
+  const { x: sx, y: sy } = unit.position;
+  const { width, height, occupancy } = grid;
 
-  const minX = Math.max(0, x - movement);
-  const maxX = Math.min(width - 1, x + movement);
-  const minY = Math.max(0, y - movement);
-  const maxY = Math.min(height - 1, y + movement);
+  const queue: { x: number; y: number; dist: number }[] = [
+    { x: sx, y: sy, dist: 0 },
+  ];
+  const visited = new Set<TileKey>([`${sy},${sx}`]);
 
-  for (let nx = minX; nx <= maxX; nx++) {
-    for (let ny = minY; ny <= maxY; ny++) {
-      if (!occupancy.get(`${ny},${nx}`)) {
-        validMoves.add({ x: nx, y: ny });
+  const forbidden = new Set<string>();
+  for (const other of units.values()) {
+    if (other.ownerId === unit.ownerId) continue;
+    const { x: ex, y: ey } = other.position;
+
+    for (const [dx, dy] of DIRS) {
+      const fx = ex + dx,
+        fy = ey + dy;
+      if (fx >= 0 && fx < width && fy >= 0 && fy < height) {
+        forbidden.add(`${fy},${fx}`);
       }
+    }
+    forbidden.add(`${ey},${ex}`);
+  }
+
+  const valid = new Set<Tile>();
+
+  const enqueue = (x: number, y: number, dist: number) => {
+    if (x < 0 || x >= width || y < 0 || y >= height) return;
+
+    const key = `${y},${x}` as TileKey;
+    if (visited.has(key)) return;
+    visited.add(key);
+
+    if (!occupancy.has(key)) valid.add({ x, y });
+    if (!forbidden.has(key)) queue.push({ x, y, dist });
+  };
+
+  while (queue.length) {
+    const { x, y, dist } = queue.shift()!;
+
+    if (dist === movement) continue;
+
+    for (const [dx, dy] of DIRS) {
+      enqueue(x + dx, y + dy, dist + 1);
     }
   }
 
-  return validMoves;
+  return valid;
+}
+
+export function bfsShort(grid: MapGrid, unit: Unit): Set<Tile> {
+  const valid = new Set<Tile>();
+  const { x: sx, y: sy } = unit.position;
+  const { occupancy } = grid;
+
+  for (const [dx, dy] of DIRS) {
+    const key = `${sy + dy},${sx + dx}` as TileKey;
+    if (!occupancy.has(key)) valid.add({ x: sx + dx, y: sy + dy });
+  }
+
+  return valid;
 }
 
 export function getValidMovesMask(
