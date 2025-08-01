@@ -7,65 +7,59 @@ import { getUnitBaseStats } from "@/data/unitBaseStats";
 import { calculateDamage } from "@/engine/helpers/combat";
 
 // types
-import type { PlayerId, UnitId } from "@/types/id";
+import type { UnitId } from "@/types/id";
 import { UnitRecord, type UnitType, type Units } from "@/types/unit";
 
-const edgeRowUnits: UnitType[] = [
-  "catapult",
-  "rider",
-  "archer",
-  "knight",
-  "mindBender",
-  "archer",
-  "rider",
-  "catapult",
+const defaultBoardString = [
+  ["c0", "r0", "a0", "k0", "m0", "a0", "r0", "c0"],
+  ["w0", "w0", "w0", "w0", "w0", "w0", "w0", "w0"],
+  ["__", "__", "__", "__", "__", "__", "__", "__"],
+  ["__", "__", "__", "__", "__", "__", "__", "__"],
+  ["__", "__", "__", "__", "__", "__", "__", "__"],
+  ["__", "__", "__", "__", "__", "__", "__", "__"],
+  ["w1", "w1", "w1", "w1", "w1", "w1", "w1", "w1"],
+  ["c1", "r1", "a1", "k1", "m1", "a1", "r1", "c1"],
 ];
 
-const warriorRowUnits: UnitType[] = [
-  "warrior",
-  "warrior",
-  "warrior",
-  "warrior",
-  "warrior",
-  "warrior",
-  "warrior",
-  "warrior",
-];
+const unitCodeMap: Record<string, UnitType> = {
+  c: "catapult",
+  r: "rider",
+  a: "archer",
+  k: "knight",
+  m: "mindBender",
+  w: "warrior",
+};
 
-function placeRowUnits(
-  units: Units,
-  owner: PlayerId,
-  unitTypes: UnitType[],
-  row: number
-) {
-  for (let col = 0; col < unitTypes.length; col++) {
-    const unitId = createBrandedId("unit");
-    const unitType = unitTypes[col];
+export function createUnitsStr(board: string[][]): Units {
+  let units = IMap<UnitId, UnitRecord>();
 
-    const u = new UnitRecord({
-      id: unitId,
-      type: unitType,
-      ownerId: owner,
-      position: { x: col, y: row },
-      stats: getUnitBaseStats(unitType),
-    });
+  for (let y = 0; y < board.length; y++) {
+    for (let x = 0; x < board[0].length; x++) {
+      if (board[y][x] === "__") continue;
 
-    units = units.set(unitId, u);
+      const unitId = createBrandedId("unit");
+      const unitType = unitCodeMap[board[y][x][0]];
+      const ownerId = parseInt(board[y][x][1]);
+
+      const u = new UnitRecord({
+        id: unitId,
+        type: unitType,
+        ownerId: ownerId,
+        position: { x, y },
+        stats: getUnitBaseStats(unitType),
+      });
+
+      units = units.set(unitId, u);
+    }
   }
 
   return units;
 }
 
-export function createUnits(playerA: PlayerId, playerB: PlayerId): Units {
-  let units = IMap<UnitId, UnitRecord>();
-
-  units = placeRowUnits(units, playerA, edgeRowUnits, 0);
-  units = placeRowUnits(units, playerA, warriorRowUnits, 1);
-
-  units = placeRowUnits(units, playerB, edgeRowUnits, 7);
-  units = placeRowUnits(units, playerB, warriorRowUnits, 6);
-
-  return units;
+export function createUnits(
+  boardString: string[][] = defaultBoardString
+): Units {
+  return createUnitsStr(boardString);
 }
 
 export function moveUnit(

@@ -32,7 +32,6 @@ import { defaultGameConfig } from "@/data/defaultGameConfig";
 import type { GameOutcome, GameState } from "@/types/game";
 import type { GameConfig } from "@/types/gameConfig";
 import type { UnitActionPayload } from "@/types/action";
-import type { PlayerId } from "@/types/id";
 import type { MapGrid } from "@/types/tile";
 import type { Units } from "@/types/unit";
 
@@ -40,8 +39,6 @@ export function createReducer(
   config: GameConfig = defaultGameConfig
 ): GameState {
   const { playerTypes } = config;
-  const playerA: PlayerId = 0;
-  const playerB: PlayerId = 1;
 
   const playerOrder = [
     { name: "A", type: playerTypes[0] },
@@ -52,7 +49,7 @@ export function createReducer(
     return { id, ...player };
   });
 
-  const units: Units = createUnits(playerA, playerB);
+  const units: Units = createUnits();
   const map: MapGrid = createMap(8, 8, units);
 
   const outcome: GameOutcome = { status: "ongoing" };
