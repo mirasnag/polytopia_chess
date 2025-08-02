@@ -41,11 +41,12 @@ const GameView = () => {
 
     const runBotAction = async (action: GameAction) => {
       if (cancelled) return;
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 500));
       dispatch(action);
     };
 
     const runBotTurn = async () => {
+      await new Promise((resolve) => setTimeout(resolve, 500));
       if (currentPlayer.type === "human") return;
 
       const botActions = botChooseActions(state, currentPlayer.type);

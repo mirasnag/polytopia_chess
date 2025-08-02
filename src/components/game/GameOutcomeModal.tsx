@@ -15,15 +15,15 @@ const GameOutcomeModal = () => {
   const winner =
     outcome.status === "finished" ? players[outcome.winnerId].name : "";
 
-  const handleExitClick = () => {
-    navigate("/");
-  };
-
-  const handleNewGameClick = () => {
+  const handleRestartClick = () => {
     dispatch({
       type: "create",
       payload: { config: config },
     });
+  };
+
+  const handleNewGameClick = () => {
+    navigate("/game/creation");
   };
 
   return (
@@ -38,7 +38,7 @@ const GameOutcomeModal = () => {
           </div>
         )}
         <div className={classes.actions}>
-          <button onClick={handleExitClick}>Exit</button>
+          <button onClick={handleRestartClick}>Restart</button>
           <button onClick={handleNewGameClick}>New Game</button>
         </div>
       </div>

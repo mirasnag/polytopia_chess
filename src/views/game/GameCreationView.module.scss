@@ -6,13 +6,36 @@
   justify-content: center;
   align-items: center;
 
-  .buttons {
+  .contentWrapper {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+
+    gap: 2rem;
+  }
+
+  .playerSelectors {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+
+    .playerSelector {
+      appearance: none;
+      text-align: center;
+    }
+
+    .vsText {
+      color: white;
+    }
+  }
+
+  .startButtonWrapper {
+    width: 100%;
+    padding: 0 0.5rem;
 
     button {
-      text-transform: none;
+      width: 100%;
     }
   }
 }
