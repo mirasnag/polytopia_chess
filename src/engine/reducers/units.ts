@@ -8,29 +8,12 @@ import { calculateDamage } from "@/engine/helpers/combat";
 
 // types
 import type { UnitId } from "@/types/id";
-import { UnitRecord, type UnitType, type Units } from "@/types/unit";
+import { UnitRecord, type Units } from "@/types/unit";
 
-const defaultBoardString = [
-  ["c0", "r0", "a0", "k0", "m0", "a0", "r0", "c0"],
-  ["w0", "w0", "w0", "w0", "w0", "w0", "w0", "w0"],
-  ["__", "__", "__", "__", "__", "__", "__", "__"],
-  ["__", "__", "__", "__", "__", "__", "__", "__"],
-  ["__", "__", "__", "__", "__", "__", "__", "__"],
-  ["__", "__", "__", "__", "__", "__", "__", "__"],
-  ["w1", "w1", "w1", "w1", "w1", "w1", "w1", "w1"],
-  ["c1", "r1", "a1", "k1", "m1", "a1", "r1", "c1"],
-];
+// data
+import { unitCodeMap } from "@/data/defaultGameConfig";
 
-const unitCodeMap: Record<string, UnitType> = {
-  c: "catapult",
-  r: "rider",
-  a: "archer",
-  k: "knight",
-  m: "mindBender",
-  w: "warrior",
-};
-
-export function createUnitsStr(board: string[][]): Units {
+export function createUnits(board: string[][]): Units {
   let units = IMap<UnitId, UnitRecord>();
 
   for (let y = 0; y < board.length; y++) {
@@ -54,12 +37,6 @@ export function createUnitsStr(board: string[][]): Units {
   }
 
   return units;
-}
-
-export function createUnits(
-  boardString: string[][] = defaultBoardString
-): Units {
-  return createUnitsStr(boardString);
 }
 
 export function moveUnit(

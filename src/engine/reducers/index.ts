@@ -35,24 +35,31 @@ import type { UnitActionPayload } from "@/types/action";
 import type { MapGrid } from "@/types/tile";
 import type { Units } from "@/types/unit";
 
-export function createReducer(
-  config: GameConfig = defaultGameConfig
-): GameState {
-  const { playerTypes } = config;
+export function createReducer(overrideConfig: Partial<GameConfig>): GameState {
+  const config = {
+    ...defaultGameConfig,
+    ...overrideConfig,
+  };
 
-  const playerOrder = [
-    { name: "A", type: playerTypes[0] },
-    { name: "B", type: playerTypes[1] },
-  ];
+  const { playerTypes, map: mapConfig } = config;
+
+  // Currently no order shuffling applied
+  const playerOrder = playerTypes.map((playerType) => {
+    return { name: `${playerType}`, type: playerType };
+  });
 
   const players = playerOrder.map((player, id) => {
     return { id, ...player };
   });
 
-  const units: Units = createUnits();
-  const map: MapGrid = createMap(8, 8, units);
+  const units: Units = createUnits(mapConfig.boardLayout);
+  const map: MapGrid = createMap(mapConfig.width, mapConfig.height, units);
 
-  const outcome: GameOutcome = { status: "ongoing" };
+  const outcome: GameOutcome = {
+    status: "ongoing",
+    winnerId: null,
+    reason: null,
+  };
   const turn = getInitialTurn();
 
   const zTable = createZobristTable();

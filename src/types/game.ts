@@ -25,7 +25,7 @@ export interface Turn {
 }
 
 export type GameOutcome =
-  | { status: "ongoing" }
+  | { status: "ongoing"; winnerId: null; reason: null }
   | {
       status: "finished";
       winnerId: PlayerId;
