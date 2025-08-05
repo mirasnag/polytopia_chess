@@ -2,7 +2,7 @@
 import type { UnitStats, UnitType } from "@/types/unit";
 
 // shoud not be exported or modified
-const UNIT_BASE_STATS: Record<UnitType, UnitStats> = {
+export const UNIT_BASE_STATS: Record<UnitType, UnitStats> = {
   warrior: {
     hp: 10,
     attack: 2,

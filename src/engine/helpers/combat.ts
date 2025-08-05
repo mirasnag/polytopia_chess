@@ -1,5 +1,5 @@
 // data
-import { getUnitBaseStats, getUnitTraits } from "@/data/unitBaseStats";
+import { getUnitTraits } from "@/data/unitBaseStats";
 
 // types
 import type { GameState, Turn } from "@/types/game";
@@ -12,8 +12,8 @@ export function calculateDamage(
   attackingUnit: Unit,
   defendingUnit: Unit
 ): number {
-  const attack = getUnitBaseStats(attackingUnit.type).attack;
-  const defense = getUnitBaseStats(defendingUnit.type).defense;
+  const attack = attackingUnit.stats.attack;
+  const defense = defendingUnit.stats.defense;
 
   return Math.max(0, baseDamage + attack - defense);
 }
@@ -51,7 +51,7 @@ export function getValidAttacks(state: GameState, unit: Unit): Set<Tile> {
 
   if (!canAttack(unit, state.turn)) return validAttacks;
 
-  const { range } = getUnitBaseStats(unit.type);
+  const range = unit.stats.range;
   const { x, y } = unit.position;
   const { width, height, occupancy } = state.map;
   const units = state.units;
