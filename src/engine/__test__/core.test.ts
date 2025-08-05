@@ -1,4 +1,5 @@
 import * as core from "@/engine/core";
+import * as reducers from "@/engine/reducers/index";
 import type { GameState } from "@/types/game";
 import type { GameAction } from "@/types/action";
 
@@ -20,6 +21,32 @@ describe("gameEngine / core", () => {
       expect(Array.isArray(newState.players)).toBe(true);
       expect(newState.players.length).toBe(2);
       expect(newState.turn.counter).toBe(1);
+    });
+
+    it("delegates to reducers correctly", () => {
+      const attackSpy = jest
+        .spyOn(reducers, "attackReducer")
+        .mockImplementationOnce(() => fakeState);
+      core.applyAction(fakeState, makeAction("attack"));
+      expect(attackSpy).toHaveBeenCalledWith(fakeState, expect.any(Object));
+
+      const moveSpy = jest
+        .spyOn(reducers, "moveReducer")
+        .mockImplementationOnce(() => fakeState);
+      core.applyAction(fakeState, makeAction("move"));
+      expect(moveSpy).toHaveBeenCalledWith(fakeState, expect.any(Object));
+
+      const resignSpy = jest
+        .spyOn(reducers, "resignReducer")
+        .mockImplementationOnce(() => fakeState);
+      core.applyAction(fakeState, makeAction("resign"));
+      expect(resignSpy).toHaveBeenCalledWith(fakeState);
+
+      const advanceSpy = jest
+        .spyOn(reducers, "advanceReducer")
+        .mockImplementationOnce(() => fakeState);
+      core.applyAction(fakeState, makeAction("advance"));
+      expect(advanceSpy).toHaveBeenCalledWith(fakeState);
     });
 
     it("falls through for unknown action", () => {

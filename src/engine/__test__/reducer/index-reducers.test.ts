@@ -23,7 +23,7 @@ const smallGameConfig: GameConfig = {
     height: 3,
     boardLayout: [
       ["__", "__", "__"],
-      ["w0", "a1", "__"],
+      ["w0", "m1", "__"],
       ["__", "__", "__"],
     ],
   },
@@ -46,7 +46,7 @@ describe("engine/index reducers", () => {
     expect(baseState.units.size).toEqual(2);
     expect(firstUnit.type).toBe("warrior");
     expect(firstUnit.position).toEqual({ x: 0, y: 1 });
-    expect(secondUnit.type).toBe("archer");
+    expect(secondUnit.type).toBe("mindBender");
     expect(secondUnit.position).toEqual({ x: 1, y: 1 });
 
     expect(baseState.map.width).toBe(smallGameConfig.map.width);
@@ -154,6 +154,21 @@ describe("engine/index reducers", () => {
       type: "kill",
       payload: payload2,
     });
+    // outcome should be finished with reason king capture
+    expect(next2.outcome.status).toBe("finished");
+    expect(next2.outcome.reason).toBe("kingCaptured");
+  });
+
+  it("throws if unit is not found", () => {
+    expect(() =>
+      moveReducer(baseState, { unitId: "unit-none", to: { x: 0, y: 0 } })
+    ).toThrow();
+    expect(() =>
+      attackReducer(baseState, { unitId: "unit-none", to: secondUnit.position })
+    ).toThrow();
+    expect(() =>
+      attackReducer(baseState, { unitId: firstUnit.id, to: { x: 0, y: 0 } })
+    ).toThrow();
   });
 
   it("resignReducer sets outcome to finished with correct winner", () => {

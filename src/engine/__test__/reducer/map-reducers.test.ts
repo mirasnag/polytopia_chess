@@ -50,6 +50,9 @@ describe("map helpers", () => {
     expect(mapGrid.occupancy.get("0,2")).toBe("u2");
     // no other occupancy entries
     expect(mapGrid.occupancy.size).toBe(2);
+
+    const emptyMap = createMap();
+    expect(emptyMap.occupancy.size).toBe(0);
   });
 
   test("moveTileOccupant: moves unitId from old to new key", () => {
