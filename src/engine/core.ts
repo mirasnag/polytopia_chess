@@ -41,7 +41,7 @@ export const applyAction = (
   switch (action.type) {
     case "create":
       const { config } = action.payload;
-      return createReducer(config);
+      return createReducer({ ...config });
     case "resign":
       return resignReducer(state);
     case "advance":
