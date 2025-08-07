@@ -17,7 +17,7 @@ import {
   createZobristTable,
   updateZobristKeyAdvanceTurn,
   updateZobristKeyUnits,
-} from "../helpers/zobrist";
+} from "./zobrist";
 import {
   createMap,
   moveTileOccupant,
