@@ -2,7 +2,6 @@
 import { gameEngine } from "../core";
 import { ChildGenerator } from "../helpers/gameTree";
 import { getPlayerScore } from "../helpers/evaluation";
-import { getRandomArrayEntry } from "@/utils/common.util";
 
 // types
 import type { GameState } from "@/types/game";
@@ -11,7 +10,7 @@ import type { PlayerId } from "@/types/id";
 
 interface MinimaxReturn {
   score: number;
-  actions: TurnActions[];
+  actions: TurnActions;
 }
 
 const advanceAction: GameAction = { type: "advance", payload: {} };
@@ -32,8 +31,7 @@ export const minimaxBotAlgo = (
   start = performance.now();
   const { actions } = minimaxIterativeDeepening(state, depth, currentPlayerId);
 
-  const randomBestAction = getRandomArrayEntry(actions);
-  return randomBestAction ?? [];
+  return actions;
 };
 
 // minimax with iterative deepening
@@ -45,8 +43,8 @@ export const minimaxIterativeDeepening = (
   let alpha = -Infinity;
   let beta = Infinity;
   const delta = 10;
-  let bestActions: TurnActions[] = [];
-  let bestScore: number = 0;
+  let bestActions: MinimaxReturn["actions"] = [];
+  let bestScore: MinimaxReturn["score"] = 0;
 
   for (let curDepth = 1; curDepth <= depth; curDepth++) {
     let { score, actions } = minimax(
@@ -94,7 +92,7 @@ export const minimax = (
 
   if (isMainPlayer) {
     let bestScore = -Infinity;
-    let bestActions: TurnActions[] = [];
+    let bestActions: MinimaxReturn["actions"] = [];
 
     while (childState) {
       const { score: childScore } = minimax(
@@ -107,9 +105,7 @@ export const minimax = (
 
       if (childScore > bestScore) {
         bestScore = childScore;
-        bestActions = [childState.turn.actions];
-      } else if (childScore === bestScore) {
-        bestActions.push(childState.turn.actions);
+        bestActions = childState.turn.actions;
       }
 
       alpha = Math.max(alpha, bestScore);
@@ -124,7 +120,7 @@ export const minimax = (
     };
   } else {
     let worstScore = Infinity;
-    let worstActions: TurnActions[] = [];
+    let worstActions: MinimaxReturn["actions"] = [];
 
     while (childState) {
       const { score: childScore } = minimax(
@@ -137,9 +133,7 @@ export const minimax = (
 
       if (childScore < worstScore) {
         worstScore = childScore;
-        worstActions = [childState.turn.actions];
-      } else if (childScore === worstScore) {
-        worstActions.push(childState.turn.actions);
+        worstActions = childState.turn.actions;
       }
 
       beta = Math.min(beta, worstScore);

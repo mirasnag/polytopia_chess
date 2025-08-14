@@ -6,6 +6,7 @@ import { gameEngine } from "../core";
 import type { GameState, ZobristKey } from "@/types/game";
 import type { UnitId } from "@/types/id";
 import type { Unit } from "@/types/unit";
+import { shuffleArray } from "@/utils/common.util";
 
 type GameTreeNode = GameState;
 
@@ -24,6 +25,7 @@ export class ChildGenerator {
         this.unitOrder.push(unit);
       }
     });
+    this.unitOrder = shuffleArray(this.unitOrder);
 
     this.currentBranch = this.expandUnitBranchNodes();
   }
