@@ -1,7 +1,7 @@
 // helpers
 import { gameEngine } from "../core";
 import { ChildGenerator } from "../helpers/gameTree";
-import { getPlayerScore } from "../helpers/evaluation";
+import { getPlayerScore, isMateScore } from "../helpers/evaluation";
 
 // types
 import type { GameState } from "@/types/game";
@@ -22,14 +22,13 @@ export const minimaxBotAlgo = (
   state: GameState,
   turnDepth: number = 1
 ): TurnActions => {
-  const currentPlayerId = state.turn.currentPlayerId;
   const playerOrder = state.players;
 
   const playerCnt = playerOrder.length;
   const depth = playerCnt * turnDepth;
 
   start = performance.now();
-  const { actions } = minimaxIterativeDeepening(state, depth, currentPlayerId);
+  const { actions } = minimaxIterativeDeepening(state, depth);
 
   return actions;
 };
@@ -38,34 +37,47 @@ export const minimaxBotAlgo = (
 export const minimaxIterativeDeepening = (
   state: GameState,
   depth: number,
-  mainPlayerId: PlayerId
+  mainPlayerId: PlayerId = state.turn.currentPlayerId
 ): MinimaxReturn => {
+  if (depth <= 1) return minimax(state, depth, mainPlayerId);
+
+  let bestResult: MinimaxReturn = minimax(state, 1, mainPlayerId);
+  let prevScore = bestResult.score;
+
   let alpha = -Infinity;
   let beta = Infinity;
-  const delta = 10;
-  let bestActions: MinimaxReturn["actions"] = [];
-  let bestScore: MinimaxReturn["score"] = 0;
+  const deltas = [10, 20, 40];
 
-  for (let curDepth = 1; curDepth <= depth; curDepth++) {
-    let { score, actions } = minimax(
-      state,
-      curDepth,
-      mainPlayerId,
-      alpha,
-      beta
-    );
-    if (score <= alpha || score >= beta) {
-      ({ score, actions } = minimax(state, curDepth, mainPlayerId));
+  for (let curDepth = 2; curDepth <= depth; curDepth++) {
+    let res: MinimaxReturn | null = null;
+    let failed = true;
+
+    for (const delta of deltas) {
+      alpha = prevScore - delta;
+      beta = prevScore + delta;
+
+      res = minimax(state, curDepth, mainPlayerId, alpha, beta);
+      prevScore = res.score;
+
+      if (alpha < res.score && res.score < beta) {
+        failed = false;
+        break;
+      }
     }
 
-    alpha = score - delta;
-    beta = score + delta;
+    if (res === null || failed) {
+      res = minimax(state, curDepth, mainPlayerId);
+      break;
+    }
 
-    bestActions = actions;
-    bestScore = score;
+    bestResult = res;
+
+    // logIter(curDepth, bestResult.score, alpha, beta, 0, failed);
+
+    if (isMateScore(bestResult.score)) break;
   }
 
-  return { score: bestScore, actions: bestActions };
+  return bestResult;
 };
 
 export const minimax = (
@@ -150,3 +162,23 @@ export const minimax = (
 
   return res;
 };
+
+export function logIter(
+  depth: number,
+  score: number,
+  alpha: number,
+  beta: number,
+  tried?: number,
+  failed?: boolean
+) {
+  console.log(
+    JSON.stringify(
+      { depth, score, alpha, beta, tries: tried, failed },
+      (_, value) => {
+        if (value === Infinity) return "Infinity";
+        if (value === -Infinity) return "Infinity";
+        return value;
+      }
+    )
+  );
+}

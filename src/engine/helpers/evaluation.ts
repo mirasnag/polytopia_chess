@@ -14,7 +14,7 @@ import type { UnitType, Unit } from "@/types/unit";
 export type GameStateEvaluation = number[];
 
 export const unitValue: Record<UnitType, number> = {
-  mindBender: 1000,
+  mindBender: 100,
   knight: 80,
   catapult: 50,
   archer: 30,
@@ -92,3 +92,6 @@ export const evaluatePlayerAction = (
 
   return 2 * scores[playerId] - totalScore;
 };
+
+export const isMateScore = (score: number) =>
+  !Number.isFinite(score) || Math.abs(score) > 1e9;
