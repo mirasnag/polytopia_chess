@@ -5,7 +5,7 @@ import { getPlayerScore, isMateScore } from "../helpers/evaluation";
 
 // types
 import type { GameState } from "@/types/game";
-import type { GameAction, TurnActions } from "@/types/action";
+import type { GameAction, TurnActions, UnitAction } from "@/types/action";
 import type { PlayerId } from "@/types/id";
 
 interface MinimaxReturn {
@@ -16,20 +16,23 @@ interface MinimaxReturn {
 const advanceAction: GameAction = { type: "advance", payload: {} };
 
 let start = performance.now();
-const maxSearchTime = 5000; // milliseconds
+const maxSearchTime = 15000; // milliseconds
 
 export const minimaxBotAlgo = (
   state: GameState,
   turnDepth: number = 1
 ): TurnActions => {
-  const playerOrder = state.players;
-
-  const playerCnt = playerOrder.length;
+  const playerCnt = state.players.length;
   const depth = playerCnt * turnDepth;
 
   start = performance.now();
-  const { actions } = minimaxIterativeDeepening(state, depth);
+  const { actions } = minimaxIterativeDeepening(
+    state,
+    depth,
+    state.turn.currentPlayerId
+  );
 
+  // logActions(state, actions as UnitAction[]);
   return actions;
 };
 
@@ -57,7 +60,6 @@ export const minimaxIterativeDeepening = (
       beta = prevScore + delta;
 
       res = minimax(state, curDepth, mainPlayerId, alpha, beta);
-      prevScore = res.score;
 
       if (alpha < res.score && res.score < beta) {
         failed = false;
@@ -67,10 +69,10 @@ export const minimaxIterativeDeepening = (
 
     if (res === null || failed) {
       res = minimax(state, curDepth, mainPlayerId);
-      break;
     }
 
     bestResult = res;
+    prevScore = res.score;
 
     // logIter(curDepth, bestResult.score, alpha, beta, 0, failed);
 
@@ -181,4 +183,18 @@ export function logIter(
       }
     )
   );
+}
+
+export function logActions(state: GameState, actions: UnitAction[]) {
+  console.log("-------------------");
+  if (actions.length === 0) return;
+  const unit = state.units.get(actions[0].payload.unitId)!;
+  console.log(
+    `${unit.type}, Initial position = ${[unit.position.y, unit.position.x]}`
+  );
+  for (const action of actions) {
+    console.log(
+      `${action.type}, to = ${[action.payload.to.y, action.payload.to.x]}`
+    );
+  }
 }
