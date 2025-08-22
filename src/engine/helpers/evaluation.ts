@@ -20,8 +20,6 @@ export const unitValue: Record<UnitType, number> = {
   archer: 30,
   rider: 30,
   warrior: 10,
-  swordsman: 50,
-  defender: 30,
 };
 
 export const evaluateUnit = (unit: Unit): number => {

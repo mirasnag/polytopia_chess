@@ -7,8 +7,6 @@ export type UnitType =
   | "rider"
   | "catapult"
   | "knight"
-  | "swordsman"
-  | "defender"
   | "mindBender";
 
 export type UnitTraitKey = "dash" | "escape" | "persist";

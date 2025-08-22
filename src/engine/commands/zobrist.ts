@@ -21,8 +21,6 @@ export const unitTypeIdx: Record<UnitType, number> = {
   catapult: 3,
   knight: 4,
   mindBender: 5,
-  swordsman: 6,
-  defender: 7,
 };
 
 export function getUnitZIndex(unit: Unit): number {

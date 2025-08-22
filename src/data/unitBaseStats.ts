@@ -49,8 +49,6 @@ export const UNIT_BASE_STATS: Record<UnitType, UnitStats> = {
     movement: 1,
     range: 1,
   },
-  swordsman: { hp: 15, attack: 3, defense: 3, movement: 1, range: 1 },
-  defender: { hp: 15, attack: 1, defense: 3, movement: 1, range: 1 },
 };
 
 export const getAllUnitBaseStats = () => UNIT_BASE_STATS;
