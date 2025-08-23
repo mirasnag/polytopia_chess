@@ -2,18 +2,6 @@ import type { ZobristKey, ZobristTable } from "@/types/game";
 import type { Unit, UnitType, Units } from "@/types/unit";
 import { randomBigInt } from "@/utils/bigint.util";
 
-export const ZtableLength = 2 * 6 * 64 * 10 + 1;
-
-export function createZobristTable(): ZobristTable {
-  const table = new BigInt64Array(ZtableLength);
-
-  for (let i = 0; i < ZtableLength; i++) {
-    table[i] = randomBigInt();
-  }
-
-  return table;
-}
-
 export const unitTypeIdx: Record<UnitType, number> = {
   warrior: 0,
   archer: 1,
@@ -23,13 +11,31 @@ export const unitTypeIdx: Record<UnitType, number> = {
   mindBender: 5,
 };
 
+export const PLAYER_BUCKETS = 2;
+export const UNIT_TYPE_BUCKETS = Object.keys(unitTypeIdx).length; // 6
+export const BOARD_SQUARES = 8 * 8;
+export const HP_BUCKETS = 10;
+export const PLAYER_ORDER_BUCKETS = 1;
+
+export const ZtableLength =
+  PLAYER_BUCKETS * UNIT_TYPE_BUCKETS * BOARD_SQUARES * HP_BUCKETS +
+  PLAYER_ORDER_BUCKETS;
+
+export function createZobristTable(): ZobristTable {
+  const table = new BigInt64Array(ZtableLength);
+  for (let i = 0; i < ZtableLength; i++) table[i] = randomBigInt();
+  return table;
+}
+
 export function getUnitZIndex(unit: Unit) {
   return (
-    ((unit.ownerId * 6 + unitTypeIdx[unit.type]) * 64 +
+    ((unit.ownerId * UNIT_TYPE_BUCKETS + unitTypeIdx[unit.type]) *
+      BOARD_SQUARES +
       unit.position.x * 8 +
       unit.position.y) *
-      10 +
-    unit.stats.hp
+      HP_BUCKETS +
+    unit.stats.hp -
+    1
   );
 }
 
