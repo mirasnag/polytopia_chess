@@ -18,8 +18,15 @@ export const gameManager = {
     if (!raw) return null;
     try {
       const objState = JSON.parse(raw);
+
       const unitsRaw = Object.values(objState.units) as Unit[];
       const occupancyRaw = objState.map.occupancy as [TileKey, UnitId][];
+
+      const zKeyRaw = objState.zKey;
+
+      const zTableRaw = Object.values(objState.zTable).map((v: any) =>
+        BigInt(v)
+      );
 
       return {
         ...objState,
@@ -30,8 +37,11 @@ export const gameManager = {
           ...objState.map,
           occupancy: IMap(occupancyRaw),
         },
+        zKey: BigInt(zKeyRaw),
+        zTable: new BigInt64Array(zTableRaw),
       };
-    } catch {
+    } catch (error) {
+      console.warn(error);
       console.warn("Invalid game state in storage");
       return null;
     }
