@@ -1,4 +1,5 @@
 import type { ZobristKey, ZobristTable } from "@/types/game";
+import type { PlayerId } from "@/types/id";
 import type { Unit, UnitType, Units } from "@/types/unit";
 import { randomBigInt } from "@/utils/bigint.util";
 
@@ -41,13 +42,18 @@ export function getUnitZIndex(unit: Unit) {
 
 export function computeZobristKey(
   zTable: ZobristTable,
-  units: Units
+  units: Units,
+  currentPlayerId: PlayerId
 ): ZobristKey {
   let zKey = BigInt(0);
 
   for (const [_, unit] of units) {
     const zIndex = getUnitZIndex(unit);
     zKey ^= zTable[zIndex];
+  }
+
+  if (currentPlayerId === 1) {
+    zKey ^= zTable[ZtableLength - 1];
   }
 
   return zKey;

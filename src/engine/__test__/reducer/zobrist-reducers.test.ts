@@ -83,8 +83,8 @@ describe("Zobrist integration tests (Units shape: UnitRecord, Units: Immutable.M
 
     const units = makeUnitsMap([u1, u2]);
 
-    const k1 = computeZobristKey(zTable, units);
-    const k2 = computeZobristKey(zTable, units);
+    const k1 = computeZobristKey(zTable, units, 0);
+    const k2 = computeZobristKey(zTable, units, 0);
     expect(k1).toBe(k2);
   });
 
@@ -99,7 +99,7 @@ describe("Zobrist integration tests (Units shape: UnitRecord, Units: Immutable.M
       hp: 1,
     });
     const unitsA = makeUnitsMap([u1]);
-    const kA = computeZobristKey(zTable, unitsA);
+    const kA = computeZobristKey(zTable, unitsA, 0);
 
     const u1b = makeUnitRecord({
       id: "u1",
@@ -110,7 +110,7 @@ describe("Zobrist integration tests (Units shape: UnitRecord, Units: Immutable.M
       hp: 2,
     });
     const unitsB = makeUnitsMap([u1b]);
-    const kB = computeZobristKey(zTable, unitsB);
+    const kB = computeZobristKey(zTable, unitsB, 0);
 
     expect(kA).not.toBe(kB);
   });
@@ -125,7 +125,7 @@ describe("Zobrist integration tests (Units shape: UnitRecord, Units: Immutable.M
       y: 2,
       hp: 3,
     });
-    const k1 = computeZobristKey(zTable, makeUnitsMap([u]));
+    const k1 = computeZobristKey(zTable, makeUnitsMap([u]), 0);
 
     const moved = makeUnitRecord({
       id: "u1",
@@ -135,7 +135,7 @@ describe("Zobrist integration tests (Units shape: UnitRecord, Units: Immutable.M
       y: 3,
       hp: 3,
     });
-    const k2 = computeZobristKey(zTable, makeUnitsMap([moved]));
+    const k2 = computeZobristKey(zTable, makeUnitsMap([moved]), 0);
 
     expect(k1).not.toBe(k2);
   });
@@ -159,8 +159,8 @@ describe("Zobrist integration tests (Units shape: UnitRecord, Units: Immutable.M
       hp: 1,
     });
 
-    const k1 = computeZobristKey(zTable, makeUnitsMap([a]));
-    const k2 = computeZobristKey(zTable, makeUnitsMap([a, b]));
+    const k1 = computeZobristKey(zTable, makeUnitsMap([a]), 0);
+    const k2 = computeZobristKey(zTable, makeUnitsMap([a, b]), 0);
     expect(k1).not.toBe(k2);
   });
 
@@ -191,7 +191,7 @@ describe("Zobrist integration tests (Units shape: UnitRecord, Units: Immutable.M
       hp: 4,
     });
     const unitsBefore = makeUnitsMap([beforeUnit]);
-    const fullBefore = computeZobristKey(zTable, unitsBefore);
+    const fullBefore = computeZobristKey(zTable, unitsBefore, 0);
 
     // simulate moveReducer: unit moved from (2,2) -> (3,2)
     const afterUnit = makeUnitRecord({
@@ -212,7 +212,7 @@ describe("Zobrist integration tests (Units shape: UnitRecord, Units: Immutable.M
       [afterUnit]
     );
 
-    const fullAfter = computeZobristKey(zTable, unitsAfter);
+    const fullAfter = computeZobristKey(zTable, unitsAfter, 0);
     expect(newKeyViaUpdater).toBe(fullAfter);
   });
 
@@ -238,7 +238,7 @@ describe("Zobrist integration tests (Units shape: UnitRecord, Units: Immutable.M
     });
 
     const unitsBefore = makeUnitsMap([attackerBefore, defenderBefore]);
-    const fullBefore = computeZobristKey(zTable, unitsBefore);
+    const fullBefore = computeZobristKey(zTable, unitsBefore, 0);
 
     // after attack: defender is removed (undefined), attacker might have same stats (or changed if your engine reduces hp)
     const attackerAfter = makeUnitRecord({
@@ -258,7 +258,7 @@ describe("Zobrist integration tests (Units shape: UnitRecord, Units: Immutable.M
       [attackerAfter, undefined] // mirrors call in your attackReducer
     );
 
-    const fullAfter = computeZobristKey(zTable, unitsAfter);
+    const fullAfter = computeZobristKey(zTable, unitsAfter, 0);
     expect(newKeyViaUpdater).toBe(fullAfter);
   });
 });

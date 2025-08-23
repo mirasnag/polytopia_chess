@@ -63,7 +63,7 @@ export function createReducer(overrideConfig: Partial<GameConfig>): GameState {
   const turn = getInitialTurn();
 
   const zTable = createZobristTable();
-  const zKey = computeZobristKey(zTable, units);
+  const zKey = computeZobristKey(zTable, units, turn.currentPlayerId);
 
   return {
     schemaVersion,
