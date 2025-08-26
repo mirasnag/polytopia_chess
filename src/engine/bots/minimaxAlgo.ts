@@ -1,12 +1,29 @@
+// library imports
+import { LRUCache } from "lru-cache";
+
 // helpers
 import { gameEngine } from "../core";
 import { ChildGenerator } from "../helpers/gameTree";
 import { getPlayerScore, isMateScore } from "../helpers/evaluation";
 
 // types
-import type { GameState } from "@/types/game";
+import type { GameState, ZobristKey } from "@/types/game";
 import type { GameAction, TurnActions, UnitAction } from "@/types/action";
 import type { PlayerId } from "@/types/id";
+
+type NodeType = "EXACT" | "LOWERBOUND" | "UPPERBOUND";
+interface GameStateCacheValue {
+  score: number;
+  depth: number;
+  nodeType: NodeType;
+  actions: TurnActions;
+  state: GameState;
+}
+
+// tranposition table for game states
+const tt = new LRUCache<ZobristKey, GameStateCacheValue>({
+  max: 10000,
+});
 
 interface MinimaxReturn {
   score: number;
@@ -32,7 +49,10 @@ export const minimaxBotAlgo = (
     state.turn.currentPlayerId
   );
 
+  // const searchTime = Math.round(performance.now() - start) / 1000;
+  // console.log("Search Time:", searchTime, "seconds");
   // logActions(state, actions as UnitAction[]);
+
   return actions;
 };
 
@@ -42,9 +62,17 @@ export const minimaxIterativeDeepening = (
   depth: number,
   mainPlayerId: PlayerId = state.turn.currentPlayerId
 ): MinimaxReturn => {
-  if (depth <= 1) return minimax(state, depth, mainPlayerId);
+  if (depth <= 1)
+    return minimax(state, depth, mainPlayerId, -Infinity, Infinity);
 
-  let bestResult: MinimaxReturn = minimax(state, 1, mainPlayerId);
+  let bestResult: MinimaxReturn = minimax(
+    state,
+    1,
+    mainPlayerId,
+    -Infinity,
+    Infinity
+  );
+
   let prevScore = bestResult.score;
 
   let alpha = -Infinity;
@@ -52,6 +80,8 @@ export const minimaxIterativeDeepening = (
   const deltas = [10, 20, 40];
 
   for (let curDepth = 2; curDepth <= depth; curDepth++) {
+    if (isMateScore(bestResult.score)) break;
+
     let res: MinimaxReturn | null = null;
     let failed = true;
 
@@ -68,15 +98,13 @@ export const minimaxIterativeDeepening = (
     }
 
     if (res === null || failed) {
-      res = minimax(state, curDepth, mainPlayerId);
+      res = minimax(state, curDepth, mainPlayerId, -Infinity, Infinity);
     }
 
     bestResult = res;
     prevScore = res.score;
 
     // logIter(curDepth, bestResult.score, alpha, beta, 0, failed);
-
-    if (isMateScore(bestResult.score)) break;
   }
 
   return bestResult;
@@ -86,23 +114,52 @@ export const minimax = (
   state: GameState,
   depth: number,
   mainPlayerId: PlayerId,
-  alpha = -Infinity,
-  beta = Infinity
+  alpha: number,
+  beta: number
 ): MinimaxReturn => {
+  const entry = tt.get(state.zKey);
+  if (entry && entry.depth >= depth) {
+    if (entry.nodeType === "EXACT")
+      return { score: entry.score, actions: entry.actions };
+    else if (entry.nodeType === "LOWERBOUND") {
+      alpha = Math.max(alpha, entry.score);
+    } else if (entry.nodeType === "UPPERBOUND") {
+      beta = Math.min(beta, entry.score);
+    }
+
+    if (alpha >= beta) {
+      return { score: entry.score, actions: entry.actions ?? [] };
+    }
+  }
+
   if (performance.now() - start > maxSearchTime) {
     return { score: getPlayerScore(state, mainPlayerId), actions: [] };
   }
 
   const { outcome, turn } = state;
-
   if (depth === 0 || outcome.status === "finished") {
-    return { score: getPlayerScore(state, mainPlayerId), actions: [] };
+    const score = getPlayerScore(state, mainPlayerId);
+
+    tt.set(state.zKey, {
+      score: score,
+      depth: depth == 0 ? 0 : Number.MAX_SAFE_INTEGER,
+      actions: [],
+      nodeType: "EXACT",
+      state: state,
+    });
+
+    return { score, actions: [] };
   }
 
   const isMainPlayer = turn.currentPlayerId === mainPlayerId;
   const gen = new ChildGenerator(state);
-  let childState: GameState | null = gen.next();
+
+  let childState: GameState | null = entry
+    ? gameEngine(state, entry.actions)
+    : gen.next();
+
   let res: MinimaxReturn;
+  let nodeType: NodeType = "EXACT";
 
   if (isMainPlayer) {
     let bestScore = -Infinity;
@@ -123,7 +180,10 @@ export const minimax = (
       }
 
       alpha = Math.max(alpha, bestScore);
-      if (beta <= alpha) break;
+      if (beta <= alpha) {
+        nodeType = "LOWERBOUND";
+        break;
+      }
 
       childState = gen.next();
     }
@@ -151,7 +211,10 @@ export const minimax = (
       }
 
       beta = Math.min(beta, worstScore);
-      if (beta <= alpha) break;
+      if (beta <= alpha) {
+        nodeType = "UPPERBOUND";
+        break;
+      }
 
       childState = gen.next();
     }
@@ -160,6 +223,20 @@ export const minimax = (
       score: worstScore,
       actions: worstActions,
     };
+  }
+
+  if (
+    !entry ||
+    entry.depth < depth ||
+    (entry.depth == depth && nodeType === "EXACT")
+  ) {
+    tt.set(state.zKey, {
+      score: res.score,
+      depth: depth,
+      actions: res.actions,
+      nodeType: nodeType,
+      state: state,
+    });
   }
 
   return res;
@@ -178,7 +255,7 @@ export function logIter(
       { depth, score, alpha, beta, tries: tried, failed },
       (_, value) => {
         if (value === Infinity) return "Infinity";
-        if (value === -Infinity) return "Infinity";
+        if (value === -Infinity) return "-Infinity";
         return value;
       }
     )
@@ -186,7 +263,7 @@ export function logIter(
 }
 
 export function logActions(state: GameState, actions: UnitAction[]) {
-  console.log("-------------------");
+  console.log("Logging Actions:");
   if (actions.length === 0) return;
   const unit = state.units.get(actions[0].payload.unitId)!;
   console.log(
