@@ -9,7 +9,6 @@ import { getPlayerScore, isMateScore } from "../helpers/evaluation";
 // types
 import type { GameState, ZobristKey } from "@/types/game";
 import type { GameAction, TurnActions, UnitAction } from "@/types/action";
-import type { PlayerId } from "@/types/id";
 
 type NodeType = "EXACT" | "LOWERBOUND" | "UPPERBOUND";
 interface GameStateCacheValue {
@@ -43,11 +42,7 @@ export const minimaxBotAlgo = (
   const depth = playerCnt * turnDepth;
 
   start = performance.now();
-  const { actions } = minimaxIterativeDeepening(
-    state,
-    depth,
-    state.turn.currentPlayerId
-  );
+  const { actions } = minimaxIterativeDeepening(state, depth);
 
   // const searchTime = Math.round(performance.now() - start) / 1000;
   // console.log("Search Time:", searchTime, "seconds");
@@ -59,19 +54,11 @@ export const minimaxBotAlgo = (
 // minimax with iterative deepening
 export const minimaxIterativeDeepening = (
   state: GameState,
-  depth: number,
-  mainPlayerId: PlayerId = state.turn.currentPlayerId
+  depth: number
 ): MinimaxReturn => {
-  if (depth <= 1)
-    return minimax(state, depth, mainPlayerId, -Infinity, Infinity);
+  if (depth <= 1) return minimax(state, depth, -Infinity, Infinity);
 
-  let bestResult: MinimaxReturn = minimax(
-    state,
-    1,
-    mainPlayerId,
-    -Infinity,
-    Infinity
-  );
+  let bestResult: MinimaxReturn = minimax(state, 1, -Infinity, Infinity);
 
   let prevScore = bestResult.score;
 
@@ -89,7 +76,7 @@ export const minimaxIterativeDeepening = (
       alpha = prevScore - delta;
       beta = prevScore + delta;
 
-      res = minimax(state, curDepth, mainPlayerId, alpha, beta);
+      res = minimax(state, curDepth, alpha, beta);
 
       if (alpha < res.score && res.score < beta) {
         failed = false;
@@ -98,7 +85,7 @@ export const minimaxIterativeDeepening = (
     }
 
     if (res === null || failed) {
-      res = minimax(state, curDepth, mainPlayerId, -Infinity, Infinity);
+      res = minimax(state, curDepth, -Infinity, Infinity);
     }
 
     bestResult = res;
@@ -113,10 +100,12 @@ export const minimaxIterativeDeepening = (
 export const minimax = (
   state: GameState,
   depth: number,
-  mainPlayerId: PlayerId,
   alpha: number,
   beta: number
 ): MinimaxReturn => {
+  const alphaOriginal = alpha;
+  const mainPlayerId = state.turn.currentPlayerId;
+
   const entry = tt.get(state.zKey);
   if (entry && entry.depth >= depth) {
     if (entry.nodeType === "EXACT")
@@ -136,8 +125,7 @@ export const minimax = (
     return { score: getPlayerScore(state, mainPlayerId), actions: [] };
   }
 
-  const { outcome, turn } = state;
-  if (depth === 0 || outcome.status === "finished") {
+  if (depth === 0 || state.outcome.status === "finished") {
     const score = getPlayerScore(state, mainPlayerId);
 
     tt.set(state.zKey, {
@@ -151,7 +139,6 @@ export const minimax = (
     return { score, actions: [] };
   }
 
-  const isMainPlayer = turn.currentPlayerId === mainPlayerId;
   const gen = new ChildGenerator(state);
 
   let childState: GameState | null = entry
@@ -159,71 +146,41 @@ export const minimax = (
     : gen.next();
 
   let res: MinimaxReturn;
-  let nodeType: NodeType = "EXACT";
 
-  if (isMainPlayer) {
-    let bestScore = -Infinity;
-    let bestActions: MinimaxReturn["actions"] = [];
+  let bestScore = -Infinity;
+  let bestActions: MinimaxReturn["actions"] = [];
 
-    while (childState) {
-      const { score: childScore } = minimax(
-        gameEngine(childState, advanceAction),
-        depth - 1,
-        mainPlayerId,
-        alpha,
-        beta
-      );
+  while (childState) {
+    const res = minimax(
+      gameEngine(childState, advanceAction),
+      depth - 1,
+      -beta,
+      -alpha
+    );
+    const childScore = -res.score;
 
-      if (childScore > bestScore) {
-        bestScore = childScore;
-        bestActions = childState.turn.actions;
-      }
-
-      alpha = Math.max(alpha, bestScore);
-      if (beta <= alpha) {
-        nodeType = "LOWERBOUND";
-        break;
-      }
-
-      childState = gen.next();
+    if (childScore > bestScore) {
+      bestScore = childScore;
+      bestActions = childState.turn.actions;
     }
 
-    res = {
-      score: bestScore,
-      actions: bestActions,
-    };
-  } else {
-    let worstScore = Infinity;
-    let worstActions: MinimaxReturn["actions"] = [];
+    alpha = Math.max(alpha, bestScore);
+    if (beta <= alpha) break;
 
-    while (childState) {
-      const { score: childScore } = minimax(
-        gameEngine(childState, advanceAction),
-        depth - 1,
-        mainPlayerId,
-        alpha,
-        beta
-      );
-
-      if (childScore < worstScore) {
-        worstScore = childScore;
-        worstActions = childState.turn.actions;
-      }
-
-      beta = Math.min(beta, worstScore);
-      if (beta <= alpha) {
-        nodeType = "UPPERBOUND";
-        break;
-      }
-
-      childState = gen.next();
-    }
-
-    res = {
-      score: worstScore,
-      actions: worstActions,
-    };
+    childState = gen.next();
   }
+
+  res = {
+    score: bestScore,
+    actions: bestActions,
+  };
+
+  const nodeType: NodeType =
+    bestScore <= alphaOriginal
+      ? "UPPERBOUND"
+      : bestScore >= beta
+      ? "LOWERBOUND"
+      : "EXACT";
 
   if (
     !entry ||
