@@ -35,7 +35,9 @@ import type { UnitActionPayload } from "@/types/action";
 import type { MapGrid } from "@/types/tile";
 import type { Units } from "@/types/unit";
 
-export function createReducer(overrideConfig: Partial<GameConfig>): GameState {
+export function createReducer(
+  overrideConfig: Partial<GameConfig> = {}
+): GameState {
   const config = {
     ...defaultGameConfig,
     ...overrideConfig,

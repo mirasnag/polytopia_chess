@@ -31,7 +31,10 @@ export function prettyLogUnits(state: GameState): void {
 
 const EMPTY_CELL = "·";
 
-export function prettyLogBoard(state: GameState): void {
+export function prettyLogBoard(state: {
+  map: GameState["map"];
+  units: GameState["units"];
+}): void {
   const { map, units } = state;
   const { width, height } = map;
 
