@@ -5,21 +5,24 @@ import type {
   MoveActionKey,
   UnitAction,
 } from "@/types/action";
-import type { Unit } from "@/types/unit";
 
 // helpers
 import { getValidAttacks } from "./combat";
 import { getValidMoves } from "./movement";
+import type { UnitId } from "@/types/id";
 
 const attackActionKey: AttackActionKey = "attack";
 const moveActionKey: MoveActionKey = "move";
 
 export function getValidUnitActions(
   state: GameState,
-  unit: Unit
+  unitId: UnitId
 ): UnitAction[] {
-  const validActions: UnitAction[] = [];
+  const unit = state.units.get(unitId);
 
+  if (!unit) return [];
+
+  const validActions: UnitAction[] = [];
   const validUnitAttacks = getValidAttacks(state, unit);
   validUnitAttacks.forEach((attackingTile) => {
     validActions.push({
@@ -54,13 +57,13 @@ export function getAllValidUnitActions(state: GameState): UnitAction[] {
   if (actingUnitId) {
     const actingUnit = units.get(actingUnitId);
 
-    return actingUnit ? getValidUnitActions(state, actingUnit) : [];
+    return actingUnit ? getValidUnitActions(state, actingUnit.id) : [];
   }
 
   const validActions: UnitAction[] = [];
   units.forEach((unit) => {
     if (unit.ownerId === currentPlayerId) {
-      const validUnitActions = getValidUnitActions(state, unit);
+      const validUnitActions = getValidUnitActions(state, unit.id);
 
       validActions.push(...validUnitActions);
     }

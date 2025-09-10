@@ -9,7 +9,7 @@ export type UnitType =
   | "knight"
   | "mindBender";
 
-export type UnitTraitKey = "dash" | "escape" | "persist";
+export type UnitTraitKey = "dash" | "escape" | "persist" | "stiff";
 
 export interface UnitTrait {
   description: string;
@@ -21,7 +21,7 @@ export interface UnitStats {
   defense: number;
   movement: number;
   range: number;
-  traits?: UnitTraitKey[];
+  traits: UnitTraitKey[];
 }
 
 export interface Unit {
@@ -37,7 +37,7 @@ const DefaultUnit: Unit = {
   type: "" as any,
   ownerId: "" as any,
   position: { x: 0, y: 0 },
-  stats: { hp: 0, attack: 0, defense: 0, movement: 0, range: 0 },
+  stats: { hp: 0, attack: 0, defense: 0, movement: 0, range: 0, traits: [] },
 };
 
 export class UnitRecord extends IRecord(DefaultUnit) {

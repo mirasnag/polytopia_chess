@@ -44,13 +44,8 @@ export class ChildGenerator {
   ): GameTreeNode[] {
     const res: GameTreeNode[] = [];
     const stateSet = new Set<ZobristKey>();
-    const unit = state.units.get(unitId);
 
-    if (!unit) {
-      throw new Error("Unit not found!");
-    }
-
-    const singleActions = getValidUnitActions(state, unit);
+    const singleActions = getValidUnitActions(state, unitId);
 
     singleActions.forEach((singleAction) => {
       const curState = gameEngine(state, singleAction);

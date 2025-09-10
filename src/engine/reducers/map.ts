@@ -60,3 +60,28 @@ export function replaceTileOccupant(
     occupancy: map.occupancy.delete(keyFrom).set(keyTo, unitId),
   };
 }
+
+/**
+ * Immutably sets occupancy entries at "from" to corresponding position from "to"
+ * Assumes that "from" and "to" has the same size
+ * @param map
+ * @param from
+ * @param to
+ */
+type OptionalTile = { x: number; y: number } | undefined;
+
+export function updateTileOccupants(
+  map: MapGrid,
+  from: { x: number; y: number }[],
+  to: OptionalTile[]
+): MapGrid {
+  let updatedMap: MapGrid = { ...map };
+
+  for (let i = 0; i < from.length; i++) {
+    updatedMap = to[i]
+      ? moveTileOccupant(updatedMap, from[i], to[i]!)
+      : removeTileOccupant(updatedMap, from[i]);
+  }
+
+  return updatedMap;
+}

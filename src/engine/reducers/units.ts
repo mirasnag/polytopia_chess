@@ -4,7 +4,7 @@ import { Map as IMap } from "immutable";
 // utils
 import { createBrandedId } from "@/utils/common.util";
 import { getUnitBaseStats } from "@/data/unitBaseStats";
-import { calculateDamage } from "@/engine/helpers/combat";
+import { calculateDamage, canRetaliate } from "@/engine/helpers/combat";
 
 // types
 import type { UnitId } from "@/types/id";
@@ -59,24 +59,32 @@ export function attackUnit(
     throw new Error("Unit not found");
   }
 
-  const damage = calculateDamage(attackingUnit, defendingUnit);
-  const isKilled = defendingUnit.stats.hp <= damage;
+  const defenderFinalHP =
+    defendingUnit.stats.hp - calculateDamage(attackingUnit, defendingUnit);
 
-  if (isKilled) {
+  if (defenderFinalHP <= 0) {
     if (attackingUnit.stats.range === 1) {
-      units = units.set(
-        attackingUnitId,
-        attackingUnit.set("position", defendingUnit.position)
+      units = units.setIn(
+        [attackingUnitId, "position"],
+        defendingUnit.position
       );
     }
     units = units.delete(defendingUnitId);
-  } else {
-    const damagedDefender = defendingUnit.set("stats", {
-      ...defendingUnit.stats,
-      hp: defendingUnit.stats.hp - damage,
-    });
-    units = units.set(defendingUnitId, damagedDefender);
+    return units;
   }
 
+  const damagedDefender = defendingUnit.setIn(["stats", "hp"], defenderFinalHP);
+  units = units.set(defendingUnitId, damagedDefender);
+
+  if (canRetaliate(attackingUnit, damagedDefender)) {
+    const attackerFinalHP =
+      attackingUnit.stats.hp -
+      calculateDamage(damagedDefender, attackingUnit, true);
+
+    units =
+      attackerFinalHP <= 0
+        ? units.delete(attackingUnitId)
+        : units.setIn([attackingUnitId, "stats", "hp"], attackerFinalHP);
+  }
   return units;
 }

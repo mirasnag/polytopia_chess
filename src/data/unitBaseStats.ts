@@ -33,6 +33,7 @@ export const UNIT_BASE_STATS: Record<UnitType, UnitStats> = {
     defense: 0,
     movement: 1,
     range: 3,
+    traits: ["stiff"],
   },
   knight: {
     hp: 10,
@@ -48,6 +49,7 @@ export const UNIT_BASE_STATS: Record<UnitType, UnitStats> = {
     defense: 0,
     movement: 1,
     range: 1,
+    traits: ["stiff"],
   },
 };
 

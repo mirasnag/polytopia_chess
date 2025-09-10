@@ -18,12 +18,7 @@ import {
   updateZobristKeyAdvanceTurn,
   updateZobristKeyUnits,
 } from "./zobrist";
-import {
-  createMap,
-  moveTileOccupant,
-  removeTileOccupant,
-  replaceTileOccupant,
-} from "./map";
+import { createMap, moveTileOccupant, updateTileOccupants } from "./map";
 
 // data
 import { defaultGameConfig } from "@/data/defaultGameConfig";
@@ -134,20 +129,17 @@ export function attackReducer(
     defendingUnitId
   );
 
+  const updatedMap = updateTileOccupants(
+    state.map,
+    [defendingUnit.position, attackingUnit.position],
+    [
+      updatedUnits.get(defendingUnitId)?.position,
+      updatedUnits.get(attackingUnitId)?.position,
+    ]
+  );
+
   const isKilled = updatedUnits.get(defendingUnitId) === undefined;
   const isKingKilled = isKing(defendingUnit) && isKilled;
-
-  const updatedMap = isKilled
-    ? attackingUnit.stats.range === 1
-      ? replaceTileOccupant(
-          state.map,
-          attackingUnit.position,
-          defendingUnit.position
-        )
-      : removeTileOccupant(state.map, defendingUnit.position)
-    : {
-        ...state.map,
-      };
 
   const updatedOutcome = isKingKilled
     ? kingCaptureOutcome(attackingUnit.ownerId)

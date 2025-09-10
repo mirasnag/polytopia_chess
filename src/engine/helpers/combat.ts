@@ -10,12 +10,15 @@ const baseDamage = 5;
 
 export function calculateDamage(
   attackingUnit: Unit,
-  defendingUnit: Unit
+  defendingUnit: Unit,
+  isCounter: boolean = false
 ): number {
   const attack = attackingUnit.stats.attack;
   const defense = defendingUnit.stats.defense;
 
-  return Math.max(0, baseDamage + attack - defense);
+  return isCounter
+    ? Math.max(0, baseDamage + attack - defense - 2)
+    : Math.max(0, baseDamage + attack - defense);
 }
 
 export function canAttack(unit: Unit, turn: Turn): boolean {
@@ -93,4 +96,16 @@ export function getValidAttacksMask(
   });
 
   return mask;
+}
+
+export function canRetaliate(
+  attackingUnit: Unit,
+  defendingUnit: Unit
+): boolean {
+  if (defendingUnit.stats.traits.includes("stiff")) return false;
+  const distance = Math.max(
+    Math.abs(attackingUnit.position.y - defendingUnit.position.y),
+    Math.abs(attackingUnit.position.x - defendingUnit.position.x)
+  );
+  return defendingUnit.stats.range >= distance;
 }
